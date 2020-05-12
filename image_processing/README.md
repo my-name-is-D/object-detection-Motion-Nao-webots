@@ -42,6 +42,7 @@ NOTE: the distance is extracted thanks to the focallenght, the area of the objec
 ### The python files
 The two python files are codes previously made (by me or my team) to extract features with opencv (the "*good*.py") 
 Recognize money and their value. Done with pounds (NB: this file here is not executable as it is, i cleaned it a bit, will put the real code later, but not in this repository)
+
 The marker*.py extract info from find_2D_object and send them to RVIZ, the rviz part doesn't work anymore right now (not been readapted)
 The marker*.py is from : https://github.com/my-name-is-D/Robotic-System-Science-Project
 
