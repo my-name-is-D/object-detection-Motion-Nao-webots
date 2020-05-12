@@ -1,5 +1,5 @@
 # detect-object-motion-nao
-first step. Detect and extract pose object. 
+first step. Detect and extract object position. 
 
 ## Image processing
 
