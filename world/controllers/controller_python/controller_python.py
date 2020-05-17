@@ -15,6 +15,12 @@
 """Example of Python controller for Nao robot.
    This demonstrates how to access sensors and actuators"""
 
+
+import csv
+import os
+import numpy
+from controller import Motor, TouchSensor, PositionSensor
+
 from controller import Robot, Keyboard, Motion
 import rospy
 from std_msgs.msg import Float64, String
@@ -22,14 +28,64 @@ from std_msgs.msg import Float64, String
 #from rosgraph_msgs.msg import Clock
 #--synchronize
 
-class Nao (Robot,Motion):
+class Nao (Robot,Motion,PositionSensor):
     PHALANX_MAX = 8
+    MOTOR_SPEED= 5 #rad/s
+    TIMESTEP = 50 #wait time
     #def getTime(self):
     """
     def isOver(self):
         return self.Motion_isOver(self)
     """
     # load motion files
+    
+    
+    
+    def threadgetvalues(self):
+        #print(self.getTime())
+        self.sample=self.sample+1
+        self.jointsensor.append([self.sample,self.getTime(),round(self.LShoulderPitchS.getValue(),3),round(self.LShoulderRollS.getValue(),3),
+        round(self.LElbowYawS.getValue(),3),
+        round(self.LElbowRollS.getValue(),3),
+        round(self.LWristYawS.getValue(),3)])
+        
+        
+        for i in range(0, self.PHALANX_MAX):
+            self.handsensor.append([self.sample,self.getTime(),round(self.lphalanxsensor[i].getValue(),3)])
+            
+       
+        #print(self.handsensor)
+        """
+        for joint in range(0, len(self.armjoints)/2-1):
+            self.file.append([self.getTime(),self.armjoint[joint].getValue()])
+        """ 
+        
+    def jointcallback(self,data):
+         
+        self.Larmangles = data.data .split(',')
+        
+        if (float(self.Larmangles[0])> self.LShoulderPitch.getMaxPosition()):
+            self.Larmangles[0]=self.LShoulderPitch.getMaxPosition()
+        elif (float(self.Larmangles[0])< self.LShoulderPitch.getMinPosition()):
+            self.Larmangles[0]=self.LShoulderPitch.getMinPosition()
+        
+        if (float(self.Larmangles[1])> self.LShoulderRoll.getMaxPosition()):
+            self.Larmangles[1]=self.LShoulderRoll.getMaxPosition()
+        elif (float(self.Larmangles[1])< self.LShoulderRoll.getMinPosition()):
+            self.Larmangles[1]=self.LShoulderRoll.getMinPosition()    
+            
+        if (float(self.Larmangles[2])> self.LElbowYaw.getMaxPosition()):
+            self.Larmangles[2]=self.LElbowYaw.getMaxPosition()
+        elif (float(self.Larmangles[2])< self.LElbowYaw.getMinPosition()):
+            self.Larmangles[2]=self.LElbowYaw.getMinPosition()   
+        
+        if (float(self.Larmangles[3])> self.LElbowRoll.getMaxPosition()):
+            self.Larmangles[3]=self.LElbowRoll.getMaxPosition()
+        elif (float(self.Larmangles[3])< self.LElbowRoll.getMinPosition()):
+            self.Larmangles[3]=self.LElbowRoll.getMinPosition()       
+        print(self.Larmangles)    
+      
+        
     def loadMotionFiles(self):
         self.handWave = Motion('../../motions/HandWave.motion')
         self.forwards = Motion('../../motions/Forwards50.motion')
@@ -176,29 +232,38 @@ class Nao (Robot,Motion):
         self.leds[5].set(rgb & 0xFF)
         self.leds[6].set(rgb & 0xFF)
         
+ ########################################################################################
+ ########################################################################"
+ 
     def closeAndOpenHands(self, countSpikes):
         for i in range(countSpikes):
-            self.setHandsAngle(0.96)
+            
             #rospy.get_rostime() #get time as rospy.Time instance
             #rospy.get_time() #get time as float secs
             #rospy.sleep(1) 
-            self.startMotion(self.OpenLHand)
+            #self.startMotion(self.OpenLHand)
+            
             """
-            while not self.OpenLHand.isOver():
+            while self.OpenLHand.isOver() == False:
                 robot.step(self.timeStep)
             """
-            #while not setHandsAngle.isOver():
-            #print("ROBOT POSE")
+		
+            #print("duration")
+            #print (self.OpenLHand.getDuration())
+            
             #print(self.getTargetPosition())
             
             
             self.setHandsAngle(0.96)
-            robot.step(200)#self.timestep)
+            
+            robot.step(200)
             self.setHandsAngle(0.00)
             robot.step(200)
+            
+            
             """
             self.startMotion(self.CloseLHand)
-            while not self.CloseLHand.isOver():
+            while self.CloseLHand.isOver() == False:
                 robot.step(self.timeStep)
             """
                 #robot.getPosition()
@@ -220,8 +285,16 @@ class Nao (Robot,Motion):
 
             if len(self.rphalanx) > i and self.rphalanx[i] is not None:
                 self.rphalanx[i].setPosition(clampedAngle)
+                #print(self.rphalanx[i].getAcceleration())
+                #print(self.rphalanx[i].getVelocity())
+                
+                #self.lphalanx[i].setVelocity(0.5)
+                #cCCCCCCCprint(self.lphalanx[i].getAcceleration())
             if len(self.lphalanx) > i and self.lphalanx[i] is not None:
                 self.lphalanx[i].setPosition(clampedAngle)
+                #self.lphalanx[i].setVelocity(10)
+                #self.lphalanx[i].setAcceleration(10)
+
 
     def printHelp(self):
         print('----------nao_demo_python----------')
@@ -245,7 +318,7 @@ class Nao (Robot,Motion):
 
     def findAndEnableDevices(self):
         # get the time step of the current world.
-        self.timeStep = int(self.getBasicTimeStep())
+        self.timeStep = self.TIMESTEP#int(self.getBasicTimeStep())
 
         # camera
         self.cameraTop = self.getCamera("CameraTop")
@@ -275,7 +348,64 @@ class Nao (Robot,Motion):
         for i in range(0, len(usNames)):
             self.us.append(self.getDistanceSensor(usNames[i]))
             self.us[i].enable(self.timeStep)
-
+        
+        #Hand touch sensor
+        #self.HandTouchLeft = self.getTouchSensor('LHand/Touch/Right')
+        
+        #SENSORS
+        self.armjointsensors=[]
+        armjoints=['LShoulderPitchS',"LShoulderRollS","LElbowYawS","LElbowRollS","LWristYawS"
+                        'RShoulderPitchS',"RShoulderRollS","RElbowYawS","RElbowRollS", "RWristYawS"]    
+        
+        """"
+        for i in range(0,len(armjoints)/2-1):
+        # shoulder pitch sensors
+            self.armjointsensors.append(self.getPositionSensor(armjoints[i]))
+            self.armjointsensors[i].enable(self.timeStep)
+        """
+        
+        
+       
+        self.LShoulderRollS = self.getPositionSensor("LShoulderRollS")
+        self.RShoulderRollS = self.getPositionSensor("RShoulderRollS")
+        self.LElbowYawS = self.getPositionSensor("LElbowYawS")
+        self.RElbowYawS = self.getPositionSensor("RElbowYawS")
+        self.LElbowRollS = self.getPositionSensor("LElbowRollS")
+        self.RElbowRollS = self.getPositionSensor("RElbowRollS")
+        self.LWristYawS = self.getPositionSensor("LWristYawS")
+        self.RWristYawS = self.getPositionSensor("RWristYawS")
+        
+        self.RShoulderPitchS = self.getPositionSensor("RShoulderPitchS")
+        self.LShoulderPitchS = self.getPositionSensor("LShoulderPitchS")
+        self.RShoulderPitchS.enable(self.timeStep)
+        self.LShoulderPitchS.enable(self.timeStep)
+        
+        
+        self.LShoulderRollS.enable(self.timeStep)
+        self.RShoulderRollS.enable(self.timeStep) 
+        self.LElbowYawS.enable(self.timeStep)
+        self.RElbowYawS.enable(self.timeStep)
+        self.LElbowRollS.enable(self.timeStep)
+        self.RElbowRollS.enable(self.timeStep)
+        self.LWristYawS.enable(self.timeStep)
+        self.RWristYawS.enable(self.timeStep)
+        
+        # shoulder roll motors
+        self.RShoulderRoll = self.getMotor("RShoulderRoll")
+        self.LShoulderRoll = self.getMotor("LShoulderRoll")
+        
+        # Elbow yaw motors    
+        self.RElbowYaw = self.getMotor("RElbowYaw")
+        self.LElbowYaw = self.getMotor("LElbowYaw")
+        # Elbow Roll motors    
+        self.RElbowRoll = self.getMotor("RElbowRoll")
+        self.LElbowRoll = self.getMotor("LElbowRoll")
+        
+        # Elbow Roll motors    
+        self.RWristYaw = self.getMotor("RWristYaw")
+        self.LWristYaw= self.getMotor("LWristYaw")
+        
+        
         # foot sensors
         self.fsr = []
         fsrNames = ['LFsr', 'RFsr']
@@ -308,8 +438,11 @@ class Nao (Robot,Motion):
         # but in Webots we must implement RHand/LHand with 2x8 motors
         self.lphalanx = []
         self.rphalanx = []
+        self.lphalanxsensor=[]
+        self.rphalanxsensor=[]
         self.maxPhalanxMotorPosition = []
         self.minPhalanxMotorPosition = []
+        
         for i in range(0, self.PHALANX_MAX):
             self.lphalanx.append(self.getMotor("LPhalanx%d" % (i + 1)))
             self.rphalanx.append(self.getMotor("RPhalanx%d" % (i + 1)))
@@ -317,7 +450,14 @@ class Nao (Robot,Motion):
             # assume right and left hands have the same motor position bounds
             self.maxPhalanxMotorPosition.append(self.rphalanx[i].getMaxPosition())
             self.minPhalanxMotorPosition.append(self.rphalanx[i].getMinPosition())
+            
+            self.lphalanxsensor.append(self.getPositionSensor("LPhalanx%dS" % (i + 1)))
+            self.rphalanxsensor.append(self.getPositionSensor("RPhalanx%dS" % (i + 1)))
+            self.lphalanxsensor[i].enable(self.timeStep)
+            self.rphalanxsensor[i].enable(self.timeStep)
 
+        
+        
         # shoulder pitch motors
         self.RShoulderPitch = self.getMotor("RShoulderPitch")
         self.LShoulderPitch = self.getMotor("LShoulderPitch")
@@ -337,28 +477,94 @@ class Nao (Robot,Motion):
         self.RWristYaw = self.getMotor("RWristYaw")
         self.LWristYaw= self.getMotor("LWristYaw")
         
-        
-        
-        
-        
-        
         # keyboard
         self.keyboard = self.getKeyboard()
         self.keyboard.enable(10 * self.timeStep)
-
+    
+    def writehandfile(self):
+        my_path=os.path.abspath(os.path.dirname(__file__))
+        paths=os.path.join(my_path,"../../data/hand.csv")
+        with open(paths,'w') as csvFile:
+        
+            field=['timestamp','LPhalanx1','LPhalanx2','LPhalanx3','LPhalanx4','LPhalanx5','LPhalanx6','LPhalanx7','LPhalanx8']
+            writer=csv.DictWriter(csvFile,fieldnames=field)
+            writer.writeheader()  
+            for i in range(0, len(self.handsensor),8):
+            
+                  writer.writerow({'timestamp':self.handsensor[i][1],
+                'LPhalanx1':self.handsensor[i][2] ,'LPhalanx2': self.handsensor[i+1][2],'LPhalanx3': self.handsensor[i+2][2],
+                'LPhalanx4': self.handsensor[i+3][2],
+                'LPhalanx5': self.handsensor[i+4][2],'LPhalanx6': self.handsensor[i+5][2],'LPhalanx7': self.handsensor[i+6][2],
+                'LPhalanx8':self.handsensor[i+7][2]})
+    
+    def writearmfile(self):
+        #open the csv file in which to write
+        my_path=os.path.abspath(os.path.dirname(__file__))
+        paths=os.path.join(my_path,"../../data/arm.csv")
+        with open(paths,'w') as csvFile:
+        
+            field=['timestamp','LshoulderP','LshoulderR','LelbowY','LelbowR','LwristY']
+            writer=csv.DictWriter(csvFile,fieldnames=field)
+            writer.writeheader()  
+            
+            for i in range(0,len(self.jointsensor)):
+                writer.writerow({'timestamp':self.jointsensor[i][1],
+                'LshoulderP':self.jointsensor[i][2] ,'LshoulderR': self.jointsensor[i][3],'LelbowY': self.jointsensor[i][4],
+                'LelbowR': self.jointsensor[i][5],
+                'LwristY': self.jointsensor[i][6]})
+        
+            
+            
+        """
+        with open(paths,'w') as csvFile:
+            f = open("../../data/test.txt", "a")
+            f.write(self.file)
+            f.write("\n")
+            f.close()
+        """
+    def writeobjectpose(self):
+        file = open("../../data/write.txt", "w")
+        #for left arm, lolipop pose
+        file.write(str(0.101001)+"\n")
+        file.write(str(0.312183)+"\n")
+        file.write(str(0.122544)+"\n")
+        #print str(target[2]) + " , " +str(target[0]) + " , " + str(-target[1])
+        file.close()
+    
     def __init__(self):
         Robot.__init__(self)
         self.currentlyPlaying = False
-
+        self.jointsensor=[] #to obtain muscle pos
+        self.handsensor=[]
+        self.Larmangles=[] #to obtain muscle angle from callback
+        self.sample=0
         # initialize stuff
         self.findAndEnableDevices()
         self.loadMotionFiles()
-        self.timestep=int(self.getBasicTimeStep())
+        self.timestep= self.TIMESTEP#int(self.getBasicTimeStep())
         #self.printHelp()   
-                
-
-        #pub = rospy.Publisher('motor', Float64, queue_size=10)
+        
+        #threading.Thread(target=self.threadgetvalues).start()
+        self.pub = rospy.Publisher('motor', Float64, queue_size=10)
         #rospy.Subscriber("spikes", String, self.callback) 
+        rospy.Subscriber("jointangles",String, self.jointcallback)
+    def readanglepose(self):
+        Larmangles=[]
+        print("in")
+        while (Larmangles == []):
+            with open("/home/cata/nao_ws/src/NAOKinematics/NaoPythonIK/cpp/read.txt","r") as file2:
+                for line in file2:
+                    #file2 = open("/home/cata/nao_ws/src/NAOKinematics/NaoPythonIK/cpp/read.txt","r")
+                    List = [elt.strip() for elt in line.split(',')]
+                    Larmangles.append(List)
+                    #print(file2.read().split(',')) 
+            
+            print(Larmangles)
+        return Larmangles
+        
+        
+        
+        
         
     def callback(self, data):
         print("I heard %s", data.data)
@@ -379,13 +585,66 @@ class Nao (Robot,Motion):
 
         #while True:
         rate = rospy.Rate(0.1) 
+        self.writeobjectpose()
+        
         while robot.step(self.timestep) != -1 and not rospy.is_shutdown():
+                      
+            #Larmangles=self.readanglepose()
             self.setAllLedsColor(0xff0000)
-            #self.RWristYaw.setPosition(1.8)
-            self.closeAndOpenHands(2)
+            """
+            print("before")
+            print(self.getTime())
+            print(self.RShoulderPitchS.getValue())
+            """
+            
+            self.threadgetvalues()
+            #self.setHandsAngle(0.96)
+            
+            while (self.Larmangles==[]):
+                continue
+                
+            #WITH CALLBACK()
+            self.LShoulderPitch.setPosition(float(self.Larmangles[0]))
+            self.LShoulderRoll.setPosition(float(self.Larmangles[1]))
+            self.LElbowYaw.setPosition(float(self.Larmangles[2]))
+            self.LElbowRoll.setPosition(float(self.Larmangles[3]))
+            
+            """
+            #WITH READANGLEPOSE()
+            self.LShoulderPitch.setPosition(float(Larmangles[0][0]))
+            self.LShoulderRoll.setPosition(float(Larmangles[0][1]))
+            self.LElbowYaw.setPosition(float(Larmangles[0][2]))
+            self.LElbowRoll.setPosition(float(Larmangles[0][3]))
+            """
+            robot.step(20)
+            
+            #self.setHandsAngle(0.00)
+            
+            #print(self.RShoulderPitchS.getType
+
+            """
+            robot.step(50)
+            print(self.getTime())
+            print(self.RShoulderPitchS.getValue())
+            print(self.RShoulderPitchS.getType())
+            """
+            #print(self.RWristYaw.getMinPosition())
+            #print(self.RWristYaw.getMaxPosition())
+            #self.closeAndOpenHands(2)
+            self.threadgetvalues()
+            robot.step(20)
+            self.threadgetvalues()
+            robot.step(20)
+            self.threadgetvalues()
+            robot.step(200)
+            self.threadgetvalues()
             
             #rospy.sleep(0.1)  
             self.setAllLedsColor(0x0000) 
+            
+            self.writearmfile()
+            
+            #self.writearmfile()
             #self.printCameraImage(self.cameraBottom)
             """
             now= self.getTime()
@@ -400,8 +659,13 @@ class Nao (Robot,Motion):
             msg.clock.nsecs = round(1000 * (time - msg.clock.secs)) * 1.0e+6
             clockPublisher.publish(msg)
             """
-            
 
+           
+
+            #open and read the file after the appending:
+            #f = open("demofile2.txt", "r")
+            #print(f.read()) 
+            #break
             if robot.step(self.timeStep) == -1:
                 break
 
@@ -421,5 +685,4 @@ robot = Nao()
 robot.run()
 
 # Webots triggered termination detected!
-
-saveExperimentData()
+#saveExperimentData()
