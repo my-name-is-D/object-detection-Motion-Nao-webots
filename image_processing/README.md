@@ -1,21 +1,35 @@
+# What this package does
+This package try to identify an image thanks to find_2d_object, process the object pose and extract the position according to the camera frame. Then the id of the object seen and its position x,y,z are sent as a topic. 
+
+```bash
+roslaunch image_processing launch.launch
+```
+
 # SETUP and INFO
 
 ## Using our camera:
+```bash
 sudo apt-get install ros-melodic-uvc-camera
 rosrun uvc_camera uvc_camera_node
-
+```
 ## To see our camera image: 
+```bash
 rqt_image_view
+```
 
 ## Calibrating it :
 http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration
-(don't forget to print a squared chestboard)
+(don't forget to print a SQUARED chestboard)
+
+Note to calibrate: the created file will probably be in the temp files. You have to put it in ".ros" following the indication of your uvc_camera (saying when you launch it before calibrating "can't find calibration in path_to_follow")
+After that you will probably have a new warning (or error) saying something like the names doesn't correspond or something.
+Open the calibration file X.yaml and change the camera name to the one in [] presented in your terminal. Sorry no photo, didn't think of it on the spot.  
 
 ## We can then process it :
 http://wiki.ros.org/image_proc
-
+```bash
 rosrun image_proc image_proc (in my case)
-
+```
 Then we take as input 
 /image_rect_color or /image_rect_color/compressed
 instead of 
@@ -45,7 +59,5 @@ Recognize money and their value. Done with pounds (NB: this file here is not exe
 
 The marker*.py extract info from find_2D_object and send them to RVIZ, the rviz part doesn't work anymore right now (not been readapted)
 The marker*.py is from : https://github.com/my-name-is-D/Robotic-System-Science-Project
-
-
 
 
