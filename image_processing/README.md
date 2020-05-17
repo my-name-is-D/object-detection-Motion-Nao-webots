@@ -49,7 +49,6 @@ apt-get install ros-melodic-find-object-2d
 I created the cpp file to extract the object position thanks to: 
 
 - http://robotica.unileon.es/index.php/Objects_recognition_and_position_calculation_(webcam)
-and
 - https://husarion.com/tutorials/ros-tutorials/4-visual-object-recognition/
 
 The calculus are from me, the position is based on a camera referene, not NAO hand pose
