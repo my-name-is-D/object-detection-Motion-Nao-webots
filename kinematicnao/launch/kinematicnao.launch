@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+
+
+
+
+
+<launch>
+
+    
+ <node name="talker" pkg="kinematicnao" type="kinematicnao" output="screen" />
+
+
+</launch>
+
