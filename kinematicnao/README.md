@@ -7,6 +7,7 @@
 #How this package work
 It has been adapted to ROS.
  
+ ### V1
  An object position and orientation can be written in a txt file and read here, 
  the kinematic find the appropriate angles to reach the point and send as a topic "jointangles" 
  the angles from the shoulder to the elbow to reach the end pose. 
@@ -16,6 +17,7 @@ roslaunch kinematicnao filekinematicnao.launch
 The txt file can be found in the folder data of this package, but in the code the file read is in the "world" 
 package of this repository
 
+### V2
 Another version of the code has been realised. 
 
 The object position is retrieved from a topic. 
