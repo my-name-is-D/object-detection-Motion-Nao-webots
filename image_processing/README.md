@@ -18,7 +18,7 @@ rqt_image_view
 ```
 
 ## Calibrating it :
-http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration
+- http://wiki.ros.org/camera_calibration/Tutorials/MonocularCalibration
 (don't forget to print a SQUARED chestboard)
 
 Note to calibrate: the created file will probably be in the temp files. You have to put it in ".ros" following the indication of your uvc_camera (saying when you launch it before calibrating "can't find calibration in path_to_follow")
@@ -26,7 +26,7 @@ After that you will probably have a new warning (or error) saying something like
 Open the calibration file X.yaml and change the camera name to the one in [] presented in your terminal. Sorry no photo, didn't think of it on the spot.  
 
 ## We can then process it :
-http://wiki.ros.org/image_proc
+- http://wiki.ros.org/image_proc
 ```bash
 rosrun image_proc image_proc (in my case)
 ```
@@ -40,14 +40,17 @@ After calibration my focal lenght is more or less 605 (my fl in x and y aren't e
 
 
 ## To detect objects:
-FIND_2d_object package (ROS)
+Find_2d_object package (ROS)
+```bash
+apt-get install ros-melodic-find-object-2d
+```
 
 ### The cpp file
 I created the cpp file to extract the object position thanks to: 
 
-http://robotica.unileon.es/index.php/Objects_recognition_and_position_calculation_(webcam)
+- http://robotica.unileon.es/index.php/Objects_recognition_and_position_calculation_(webcam)
 and
-https://husarion.com/tutorials/ros-tutorials/4-visual-object-recognition/
+- https://husarion.com/tutorials/ros-tutorials/4-visual-object-recognition/
 
 The calculus are from me, the position is based on a camera referene, not NAO hand pose
 
@@ -58,6 +61,6 @@ The two python files are codes previously made (by me or my team) to extract fea
 Recognize money and their value. Done with pounds (NB: this file here is not executable as it is, i cleaned it a bit, will put the real code later, but not in this repository)
 
 The marker*.py extract info from find_2D_object and send them to RVIZ, the rviz part doesn't work anymore right now (not been readapted)
-The marker*.py is from : https://github.com/my-name-is-D/Robotic-System-Science-Project
+The marker*.py is from : - https://github.com/my-name-is-D/Robotic-System-Science-Project
 
 
