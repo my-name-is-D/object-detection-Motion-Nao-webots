@@ -8,6 +8,13 @@ here you have info about how to control the motors, the time, create and manipul
 
 Don't hesitate to ask if you don't understand something, or if something is uncomplete. 
 
+to install webots and nao and launch everthing
+
+```bash
+roslaunch webots_ros complete.launch
+```
+see: - https://github.com/jhielson/neurorobotics_computational_environment
+
 ## In Motion
 handLclose and HandLOpen.motion or shooT.motion (in your world, i erased it on this github) 
 
