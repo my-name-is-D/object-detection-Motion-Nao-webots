@@ -4,7 +4,7 @@
 - https://github.com/noobswestand/NaoPythonIK
 (himself inspired from Kouretes github, see thesis :https://www.cs.umd.edu/~nkofinas/Projects/KofinasThesis.pdf for understanding NAO kinematic)
 
-#How this package work
+# How this package work
 It has been adapted to ROS.
  
  ### V1
