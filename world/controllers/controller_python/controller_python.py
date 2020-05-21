@@ -76,28 +76,32 @@ class Nao (Robot,Motion,PositionSensor):
         It also check if the angles are realisable. 
         """
          
-        self.Larmangles = data.data .split(',')
-        
-        if (float(self.Larmangles[0])> self.LShoulderPitch.getMaxPosition()):
-            self.Larmangles[0]=self.LShoulderPitch.getMaxPosition()
-        elif (float(self.Larmangles[0])< self.LShoulderPitch.getMinPosition()):
-            self.Larmangles[0]=self.LShoulderPitch.getMinPosition()
-        
-        if (float(self.Larmangles[1])> self.LShoulderRoll.getMaxPosition()):
-            self.Larmangles[1]=self.LShoulderRoll.getMaxPosition()
-        elif (float(self.Larmangles[1])< self.LShoulderRoll.getMinPosition()):
-            self.Larmangles[1]=self.LShoulderRoll.getMinPosition()    
+        if not ( data.data =="POSITION NOT REACHABLE"):
+            self.Larmangles = data.data .split(',')
             
-        if (float(self.Larmangles[2])> self.LElbowYaw.getMaxPosition()):
-            self.Larmangles[2]=self.LElbowYaw.getMaxPosition()
-        elif (float(self.Larmangles[2])< self.LElbowYaw.getMinPosition()):
-            self.Larmangles[2]=self.LElbowYaw.getMinPosition()   
-        
-        if (float(self.Larmangles[3])> self.LElbowRoll.getMaxPosition()):
-            self.Larmangles[3]=self.LElbowRoll.getMaxPosition()
-        elif (float(self.Larmangles[3])< self.LElbowRoll.getMinPosition()):
-            self.Larmangles[3]=self.LElbowRoll.getMinPosition()       
-        print(self.Larmangles)    
+            if (float(self.Larmangles[0])> self.LShoulderPitch.getMaxPosition()):
+                self.Larmangles[0]=self.LShoulderPitch.getMaxPosition()
+            elif (float(self.Larmangles[0])< self.LShoulderPitch.getMinPosition()):
+                self.Larmangles[0]=self.LShoulderPitch.getMinPosition()
+            
+            if (float(self.Larmangles[1])> self.LShoulderRoll.getMaxPosition()):
+                self.Larmangles[1]=self.LShoulderRoll.getMaxPosition()
+            elif (float(self.Larmangles[1])< self.LShoulderRoll.getMinPosition()):
+                self.Larmangles[1]=self.LShoulderRoll.getMinPosition()    
+                
+            if (float(self.Larmangles[2])> self.LElbowYaw.getMaxPosition()):
+                self.Larmangles[2]=self.LElbowYaw.getMaxPosition()
+            elif (float(self.Larmangles[2])< self.LElbowYaw.getMinPosition()):
+                self.Larmangles[2]=self.LElbowYaw.getMinPosition()   
+            
+            if (float(self.Larmangles[3])> self.LElbowRoll.getMaxPosition()):
+                self.Larmangles[3]=self.LElbowRoll.getMaxPosition()
+            elif (float(self.Larmangles[3])< self.LElbowRoll.getMinPosition()):
+                self.Larmangles[3]=self.LElbowRoll.getMinPosition()       
+            print(self.Larmangles)    
+        else:
+            
+            print(data.data)
       
         
     def loadMotionFiles(self):
@@ -216,9 +220,7 @@ class Nao (Robot,Motion,PositionSensor):
                 robot.step(self.timeStep)
             """
             print('X%d' %(i))
-            
-            
-            
+                     
 
     def setHandsAngle(self, angle):
         for i in range(0, self.PHALANX_MAX):
@@ -483,6 +485,7 @@ class Nao (Robot,Motion,PositionSensor):
         #self.writeobjectpose()
         
         while robot.step(self.timestep) != -1 and not rospy.is_shutdown():
+            print("in")
             self.setAllLedsColor(0xff0000)#to check if launched corectly
                         
             #self.threadgetvalues()
@@ -490,6 +493,7 @@ class Nao (Robot,Motion,PositionSensor):
             #robot.step(30)
             
             #ARM motion WITH CALLBACK()
+            
             while (self.Larmangles==[]):
                 continue
             
@@ -536,7 +540,7 @@ class Nao (Robot,Motion,PositionSensor):
             self.setAllLedsColor(0x0000) 
             
             self.writearmfile()
-            #self.writhandfile()
+            #self.writehandfile()
             #self.printCameraImage(self.cameraBottom)
 
            
