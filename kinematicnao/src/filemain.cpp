@@ -36,9 +36,12 @@ void convert(float x,float y, float z, float *result){
     result[0] = ch * ca;
     result[1] = sh*sb - ch*sa*cb;
     result[2] = ch*sa*sb + sh*cb;
+
     result[3] = sa;
     result[4] = ca*cb;
     result[5] = -ca*sb;
+
+
     result[6] = -sh*ca;
     result[7] = sh*sa*cb + ch*sb;
     result[8] = -sh*sa*sb + ch*cb;
