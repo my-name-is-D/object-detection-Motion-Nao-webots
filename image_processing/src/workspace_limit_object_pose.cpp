@@ -37,9 +37,9 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray& msg){
         int id = (int)msg.data[i];
 
         //WORKSPACE LENGHT
-        float Dist_arm=55.95+105.0+57.75; //219 offsethandx, upper and lower arm size
-        float OffsetLY= 98.0+15.0; //113 offset shoulder and elbow
-        float OffsetLZ=75.0+12.31; //112 offset shoulder and hand (see kinematicdefine.h)
+        float Dist_arm=5.595+10.50+5.775; //219 offsethandx, upper and lower arm size
+        float OffsetLY= 9.80+1.50; //113 offset shoulder and elbow
+        float OffsetLZ=7.50+1.231; //112 offset shoulder and hand (see kinematicdefine.h)
         //WORKSPACE RESTRICTION (PARTIAL)
         float second_Dist_arm= Dist_arm+ OffsetLY;
         float third_Dist_arm=Dist_arm+OffsetLZ;
@@ -96,8 +96,8 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray& msg){
         //X centre point
         //float x_pos = (int)(outPts.at(0).x + outPts.at(1).x + outPts.at(2).x +outPts.at(3).x) /4;
         float dArea_0 = ((widthTop + widthBottom)/2) * ((heightLeft + heightRight)/2);
-        std::cout<<"area in px" <<std::endl;
-        std::cout<<((outPts.at(0).y + outPts.at(1).y + outPts.at(2).y + outPts.at(3).y) /4)-360 <<std::endl;
+        //std::cout<<"area in px" <<std::endl;
+        //std::cout<<((outPts.at(0).y + outPts.at(1).y + outPts.at(2).y + outPts.at(3).y) /4)-360 <<std::endl;
         float realarea;
         switch(id){
         case 2:
@@ -123,11 +123,11 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray& msg){
         float dY = dX*std::sin(0 + anglex*PI/180); // calculate the y position according to the camera //Y LEFT RIGHT ROBOT //if the robot moves then it won't be 0 -i keep it as a reminder
         //float dZ_0 = dZ0 + (dArea_0/10);
 
-        punto.x = dX;// then there is the distance from camera to hand at pose 0 to consider. Here it won't be.
+        punto.x = dX/2;// then there is the distance from camera to hand at pose 0 to consider. Here it won't be. /2 to cheat on the distance and diminuish it (can see the object well after 10cm)
         punto.y = dY;
         punto.z = dZ;
 
-
+        std::cout<<" \n X "<<punto.x<<" Y "<<punto.y<<" Z "<<punto.z<<"\n"<<std::endl;
         /*
         float dY_0 = (((480/2) - (((outPts.at(0).y + outPts.at(1).y)/2) + ((heightLeft + heightRight)/4)))*dZ0)/585;
 
@@ -167,8 +167,8 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray& msg){
 
             if (!(sqrt(punto.x*punto.x+(punto.y-OffsetLY)*(punto.y-OffsetLY))<= second_Dist_arm && 0<= acos(punto.x/Dist_arm) &&
              acos(punto.x/Dist_arm)<=acos(0/Dist_arm) &&
-             asin((-67-OffsetLY)/Dist_arm)<= asin((punto.y-OffsetLY)/Dist_arm) &&
-             asin((punto.y-OffsetLY)/Dist_arm)<=asin((331-OffsetLY)/Dist_arm))){
+             asin((-6.7-OffsetLY)/Dist_arm)<= asin((punto.y-OffsetLY)/Dist_arm) &&
+             asin((punto.y-OffsetLY)/Dist_arm)<=asin((33.1-OffsetLY)/Dist_arm))){
                 //0 correspond to max point when x=Dist_arm)
                 //-67 is the min y pose and 331 is the max (with offset)
                 paralelepipedo=0;
@@ -176,8 +176,8 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray& msg){
             }//y/D x/D and DIST X Y
 
             if(!(sqrt(punto.x*punto.x+(punto.z-OffsetLZ)*(punto.z-OffsetLZ))<= third_Dist_arm &&
-            acos((305.9-OffsetLZ)/Dist_arm)<= acos((punto.z-OffsetLZ)/Dist_arm) &&
-            acos((punto.z-OffsetLZ)/Dist_arm)<=acos((-80-OffsetLZ)/Dist_arm) &&
+            acos((30.59-OffsetLZ)/Dist_arm)<= acos((punto.z-OffsetLZ)/Dist_arm) &&
+            acos((punto.z-OffsetLZ)/Dist_arm)<=acos((-8.0-OffsetLZ)/Dist_arm) &&
             asin(0/Dist_arm)<=asin(punto.x/Dist_arm)))
             {
             paralelepipedo=0;
