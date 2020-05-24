@@ -36,3 +36,6 @@ If the position is in Nao's left arm workspace then the inverse kinematic is don
 ```bash
 roslaunch kinematicnao workspacefilenao.launch 
 ```
+
+
+The workspace_stimulation.py is the python version of the workspace limitation, it send a binary stimulation if the point is in or out of the workspace
