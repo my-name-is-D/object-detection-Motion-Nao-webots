@@ -3,7 +3,7 @@
 
 //Define for the lengths of the arms foots etc
 #define ShoulderOffsetY 	98.0
-#define ShoulderOffsetZ		100.0
+#define ShoulderOffsetZ		75.0//100.0
 #define ElbowOffsetY		15.0
 #define UpperArmLength		105.0
 #define LowerArmLength		57.75
