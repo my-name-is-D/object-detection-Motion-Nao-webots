@@ -201,6 +201,9 @@ add_executable(kinematicnao src/main.cpp src/NAOKinematicsJacobian.cpp src/NAOKi
 target_link_libraries(kinematicnao ${catkin_LIBRARIES})
 add_executable(filekinematicnao src/filemain.cpp src/NAOKinematicsJacobian.cpp src/NAOKinematics.cpp)
 target_link_libraries(filekinematicnao ${catkin_LIBRARIES})
+add_executable(workspacekinematicnao src/workspacefilemain.cpp src/NAOKinematicsJacobian.cpp src/NAOKinematics.cpp)
+target_link_libraries(workspacekinematicnao ${catkin_LIBRARIES})
+
 #add_dependencies(kinematicnao beginner_tutorials_generate_messages_cpp)
 ## Add gtest based cpp test target and link libraries
 # catkin_add_gtest(${PROJECT_NAME}-test test/test_kinematicnao.cpp)
