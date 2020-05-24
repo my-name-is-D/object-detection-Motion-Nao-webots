@@ -200,6 +200,10 @@ include_directories(
 # )
 add_executable(object_pose src/object_pose.cpp)
 target_link_libraries(object_pose ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
+add_executable(workspace_object_pose src/workspace_limit_object_pose.cpp)
+target_link_libraries(workspace_object_pose ${catkin_LIBRARIES} ${OpenCV_LIBS})
+
 #############
 ## Testing ##
 #############

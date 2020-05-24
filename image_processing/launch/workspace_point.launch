@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+
+
+
+
+
+<launch>
+
+    
+
+    <node name="find_object_2d" pkg="find_object_2d" type="find_object_2d" output="screen">
+    <remap from="image" to="lifecam/image_raw"/>
+    </node>
+    <!-- <node name="mapping_marker" pkg="image_processing" type="marker_map.py" output="screen"></node>-->
+ <node name="objects_detected" pkg="image_processing" type="workspace_object_pose" output="screen" />
+    <!-- <node name="rviz" pkg="rviz" type="rviz" output="screen"></node> -->
+    <group ns="lifecam">
+    <node name="lifecam" pkg="uvc_camera" type="uvc_camera_node" output="screen">
+      
+    </node>
+  </group>
+    <!--
+    <node pkg="tf" type="static_transform_publisher" name="tf_test" args="0 0 0 0 0 0 map odom 100">      
+    <arg name="map_file" value="/home/tim/catkin_ws/src/marker_map/map_rviz/final_mapv2.yaml"></arg>
+    
+    <node pkg="map_server" type="map_server" name="map_server" args="$(arg map_file)"></node>
+    
+    
+        rosrun tf view_frames
+        should have map->odom on the frame graph
+        this node is modifying the order of the elements of this graph
+        args: x y z raz pitch yaw parents child rate
+    -->
+    
+
+
+</launch>
+
