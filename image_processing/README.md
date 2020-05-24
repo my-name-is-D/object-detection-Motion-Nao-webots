@@ -45,15 +45,25 @@ Find_2d_object package (ROS)
 apt-get install ros-melodic-find-object-2d
 ```
 
-### The cpp file
-I created the cpp file to extract the object position thanks to: 
+### The cpp files
+
+I created the cpp files to extract the object position thanks to: 
 
 - http://robotica.unileon.es/index.php/Objects_recognition_and_position_calculation_(webcam)
 - https://husarion.com/tutorials/ros-tutorials/4-visual-object-recognition/
 
+#### object_pose.cpp
+
 The calculus are from me, the position is based on a camera referene, not NAO hand pose
 
 NOTE: the distance is extracted thanks to the focallenght, the area of the object in px and the area of the object in mm, therefore using squared/rectangle/circle objects is better to calculate more easily the area. (my tube picture isn't giving good results, because i estimated wrongly the real area, while my box picture is giving fine results) 
+The topic sent with this code is in cm
+
+#### workspace_limit_object_pose.cpp
+
+Same with the addition of a workspace limitation (in cm) based on a nao h25 v3.3
+the position is sent only if it's in the workspace.
+Also, the distance x is divided by 2, in order to have further points in the workspace (workspace on x of 21cm and my camera focus is of about 10cm)
 
 ### The python files
 The two python files are codes previously made (by me or my team) to extract features with opencv (the "*good*.py") 
