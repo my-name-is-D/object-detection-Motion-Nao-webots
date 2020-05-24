@@ -27,3 +27,12 @@ then the rest is the same
 ```bash
 roslaunch kinematicnao kinematicnao.launch 
 ```
+
+### V3
+
+The object position is retrieved from a file.
+If the position is in Nao's left arm workspace then the inverse kinematic is done, else a "position not ok" (or something) is sent through the topic "jointangles"
+
+```bash
+roslaunch kinematicnao workspacefilenao.launch 
+```
