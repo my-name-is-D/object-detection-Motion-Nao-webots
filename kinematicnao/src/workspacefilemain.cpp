@@ -90,13 +90,13 @@ int main(int argc, char **argv){
 
         write.close();
         //WORKSPACE RESTRICTION (PARTIAL)
-        float second_Dist_arm= Dist_arm+ OffsetLY;
-        float third_Dist_arm=Dist_arm+OffsetLZ;
+        //float second_Dist_arm= Dist_arm+ OffsetLY;
+        //float third_Dist_arm=Dist_arm+OffsetLZ;
 //To consider the Offset of y (on y, the dist max is 331.7 while on x it's 218)
 //on z the dist max is 112+ 218 (from the origin, not from shoulder)
 
 
-        if (!(sqrt(lpx*lpx+(lpy-OffsetLY)*(lpy-OffsetLY))<= second_Dist_arm && 0<= acos(lpx/Dist_arm) &&
+        if (!(sqrt(lpx*lpx+(lpy-OffsetLY)*(lpy-OffsetLY))<= Dist_arm && 0<= acos(lpx/Dist_arm) &&
          acos(lpx/Dist_arm)<=acos(0/Dist_arm) &&
          asin((-67-OffsetLY)/Dist_arm)<= asin((lpy-OffsetLY)/Dist_arm) &&
          asin((lpy-OffsetLY)/Dist_arm)<=asin((331-OffsetLY)/Dist_arm))){
@@ -105,7 +105,7 @@ int main(int argc, char **argv){
             execution=false;
             cout<< "IN THE IF Y ALLRIGHT ";
         }//y/D x/D and DIST X Y
-        if(!(sqrt(lpx*lpx+(lpz-OffsetLZ)*(lpz-OffsetLZ))<= third_Dist_arm &&
+        if(!(sqrt(lpx*lpx+(lpz-OffsetLZ)*(lpz-OffsetLZ))<= Dist_arm &&
         acos((305.9-OffsetLZ)/Dist_arm)<= acos((lpz-OffsetLZ)/Dist_arm) &&
         acos((lpz-OffsetLZ)/Dist_arm)<=acos((-80-OffsetLZ)/Dist_arm) &&
         asin(0/Dist_arm)<=asin(lpx/Dist_arm)))
