@@ -22,3 +22,5 @@ They can then be ploted later on with
 ,,,bash
 world/data/./plotdata
 ,,,
+
+the camera data is extracted and sent as a topic.
