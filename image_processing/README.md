@@ -66,10 +66,21 @@ the position is sent only if it's in the workspace.
 Also, the distance x is divided by 2, in order to have further points in the workspace (workspace on x of 21cm and my camera focus is of about 10cm)
 
 ### The python files
-The two python files are codes previously made (by me or my team) to extract features with opencv (the "*good*.py") 
+
+#### Simulation_image.py
+This file subscribe to the topic sent by webots (the data is sent as a string because the Int32Multiarray didn't work but webots terminal didn't display errors, seriously if you can choose, gazebo is more practical if having a code adapted to a real situation is what you want, webots robots don't display topics... as would your robot).
+
+the data is transformed into an opencv image and ...
+
+too dooooo!
+
+
+
+
+Two of the python files are codes previously made (by me or my team) to extract features with opencv (the "camera_proc_finish_GOOD.py") 
 Recognize money and their value. Done with pounds (NB: this file here is not executable as it is, i cleaned it a bit, will put the real code later, but not in this repository)
 
-The marker*.py extract info from find_2D_object and send them to RVIZ, the rviz part doesn't work anymore right now (not been readapted)
-The marker*.py is from : - https://github.com/my-name-is-D/Robotic-System-Science-Project
+The marker_map.py extract info from find_2D_object and send them to RVIZ, the rviz part doesn't work anymore right now (not been readapted)
+The marker_map.py is from : - https://github.com/my-name-is-D/Robotic-System-Science-Project
 
 
