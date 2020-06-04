@@ -162,13 +162,13 @@ class Nao (Robot,Motion,PositionSensor):
         print('left: %f m, right %f m' % (dist[0], dist[1]))
 
     def printCameraImage(self, camera):
-        scaled = 2  # defines by which factor the image is subsampled
+        scaled = 1  # defines by which factor the image is subsampled
         width = camera.getWidth()
         height = camera.getHeight()
 
         # read rgb pixel values from the camera
         image = camera.getImage()
-
+        
         print('----------camera image (gray levels)---------')
         print('original resolution: %d x %d, scaled to %d x %f'
               % (width, height, width / scaled, height / scaled))
@@ -202,7 +202,7 @@ class Nao (Robot,Motion,PositionSensor):
         #For some reasons the publisher doesn't work with Int32Multiarray... but no error displayed. So there i cheated a bit
         image_string_gray=str1.join(image_matrix_gray)
         image_string_blue=str1.join(image_matrix_blue)
-        #print(image_string_gray)
+        #print(image_string_blue)
 
         self.image_gray_pub.publish(image_string_gray)
         self.image_blue_pub.publish(image_string_blue)
@@ -379,7 +379,10 @@ class Nao (Robot,Motion,PositionSensor):
             self.lphalanxsensor[i].enable(self.timeStep)
             self.rphalanxsensor[i].enable(self.timeStep)
 
+        self.HeadPitch = self.getMotor("HeadPitch")
+        self.HeadPitchS = self.getPositionSensor("HeadPitchS")
         
+        self.HeadPitchS.enable(self.timeStep)
         # shoulder pitch motors
         self.RShoulderPitch = self.getMotor("RShoulderPitch")
         self.LShoulderPitch = self.getMotor("LShoulderPitch")
@@ -521,7 +524,34 @@ class Nao (Robot,Motion,PositionSensor):
         #self.writeobjectpose()
         
         while robot.step(self.timestep) != -1 and not rospy.is_shutdown():
-            print("in")
+            
+            #print ("begin",self.HeadPitchS.getValue())
+            
+            #Head goes up and down, registering and sending image;
+            
+            while ( abs((self.HeadPitchS.getValue()-self.HeadPitch.getMaxPosition()))>0.1 or self.HeadPitchS.getValue()<0):
+                #print ("down",self.HeadPitchS.getValue())
+                #print("check:", abs((self.HeadPitchS.getValue()-self.HeadPitch.getMaxPosition())))
+                self.HeadPitch.setPosition(self.HeadPitch.getMaxPosition())
+                self.HeadPitch.setVelocity(0.1)
+                #self.HeadPitch.setAcceleration(0.2) 
+                #self.printCameraImage(self.cameraBottom) 
+                robot.step(20)
+            self.printCameraImage(self.cameraBottom)
+           
+            while (abs((self.HeadPitchS.getValue()+0.4))>0.1 or self.HeadPitchS.getValue()>0):
+                self.HeadPitch.setPosition(-0.4)
+                #print ("up",self.HeadPitchS.getValue())
+                self.HeadPitch.setVelocity(0.1)
+                #self.HeadPitch.setAcceleration(0.2) 
+                #self.printCameraImage(self.cameraBottom)     
+                robot.step(20)           
+                #robot.step(75)
+            
+            
+            
+           
+                
             self.setAllLedsColor(0xff0000)#to check if launched corectly
                         
             #self.threadgetvalues()
