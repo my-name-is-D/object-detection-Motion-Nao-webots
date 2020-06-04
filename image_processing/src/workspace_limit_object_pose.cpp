@@ -41,8 +41,8 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray& msg){
         float OffsetLY= 9.80+1.50; //113 offset shoulder and elbow
         float OffsetLZ=7.50+1.231; //112 offset shoulder and hand (see kinematicdefine.h)
         //WORKSPACE RESTRICTION (PARTIAL)
-        //float second_Dist_arm= Dist_arm+ OffsetLY;
-        //float third_Dist_arm=Dist_arm+OffsetLZ;
+        float second_Dist_arm= Dist_arm+ OffsetLY;
+        float third_Dist_arm=Dist_arm+OffsetLZ;
 
         float objectWidth = msg.data[i+1];
         float objectHeight =msg.data[i+2];
@@ -165,7 +165,7 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray& msg){
         {
             paralelepipedo = 1;
 
-            if (!(sqrt(punto.x*punto.x+(punto.y-OffsetLY)*(punto.y-OffsetLY))<= Dist_arm && 0<= acos(punto.x/Dist_arm) &&
+            if (!(sqrt(punto.x*punto.x+(punto.y-OffsetLY)*(punto.y-OffsetLY))<= second_Dist_arm && 0<= acos(punto.x/Dist_arm) &&
              acos(punto.x/Dist_arm)<=acos(0/Dist_arm) &&
              asin((-6.7-OffsetLY)/Dist_arm)<= asin((punto.y-OffsetLY)/Dist_arm) &&
              asin((punto.y-OffsetLY)/Dist_arm)<=asin((33.1-OffsetLY)/Dist_arm))){
@@ -175,7 +175,7 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray& msg){
                 std::cout<< "Not in Nao's workspace ";
             }//y/D x/D and DIST X Y
 
-            if(!(sqrt(punto.x*punto.x+(punto.z-OffsetLZ)*(punto.z-OffsetLZ))<= Dist_arm &&
+            if(!(sqrt(punto.x*punto.x+(punto.z-OffsetLZ)*(punto.z-OffsetLZ))<= third_Dist_arm &&
             acos((30.59-OffsetLZ)/Dist_arm)<= acos((punto.z-OffsetLZ)/Dist_arm) &&
             acos((punto.z-OffsetLZ)/Dist_arm)<=acos((-8.0-OffsetLZ)/Dist_arm) &&
             asin(0/Dist_arm)<=asin(punto.x/Dist_arm)))

@@ -115,9 +115,9 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray& msg){
         float dY = dX*std::sin(0 + anglex*PI/180); // calculate the y position according to the camera //Y LEFT RIGHT ROBOT //if the robot moves then it won't be 0 -i keep it as a reminder
         //float dZ_0 = dZ0 + (dArea_0/10);
         
-        punto.x = dX;// then there is the distance from camera to hand at pose 0 to consider. Here it won't be.
-        punto.y = dY;
-        punto.z = dZ;        
+        punto.x = dX*10;// then there is the distance from camera to hand at pose 0 to consider. Here it won't be.
+        punto.y = dY*10; //*10 to have the measurement in mm
+        punto.z = dZ*10;        
 
 
         /*
