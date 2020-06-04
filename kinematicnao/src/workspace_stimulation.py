@@ -51,8 +51,8 @@ def main_func():
 
 
     #np.warnings.filterwarnings('ignore')#to ignore the "invalid value if arcsin not possible"
-    #second_Dist_arm= Dist_arm+ OffsetLY
-    #third_Dist_arm=Dist_arm+OffsetLZ
+    second_Dist_arm= Dist_arm+ OffsetLY
+    third_Dist_arm=Dist_arm+OffsetLZ
 
     #To consider the Offset of y (on y, the dist max is 331.7 while on x it's 218)
     #on z the dist max is 112+ 218 (from the origin, not from shoulder)
@@ -62,14 +62,14 @@ def main_func():
         and not np.isnan(math.asin(lpx/Dist_arm)) ) :
             execution= False
             #print("1")
-        if not( math.sqrt(lpx*lpx+(lpy-OffsetLY)*(lpy-OffsetLY))<= Dist_arm and 0<= math.acos(lpx/Dist_arm) and math.acos(lpx/Dist_arm)<=math.acos(0/Dist_arm)):
+        if not( math.sqrt(lpx*lpx+(lpy-OffsetLY)*(lpy-OffsetLY))<= second_Dist_arm and 0<= math.acos(lpx/Dist_arm) and math.acos(lpx/Dist_arm)<=math.acos(0/Dist_arm)):
             execution= False
         if not (math.asin((-67-OffsetLY)/Dist_arm)<= math.asin((lpy-OffsetLY)/Dist_arm) and math.asin((lpy-OffsetLY)/Dist_arm)<=math.asin((331-OffsetLY)/Dist_arm)):
             #0 correspond to max point when x=Dist_arm)
             #-67 is the min y pose and 331 is the max (with offset)
             execution= False
             #print("2")
-        if not(math.sqrt(lpx*lpx+(lpz-OffsetLZ)*(lpz-OffsetLZ))<= Dist_arm):
+        if not(math.sqrt(lpx*lpx+(lpz-OffsetLZ)*(lpz-OffsetLZ))<= third_Dist_arm):
             execution= False
             #print("3")
         if not( math.acos((305.9-OffsetLZ)/Dist_arm)<= math.acos((lpz-OffsetLZ)/Dist_arm) and

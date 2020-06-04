@@ -25,8 +25,8 @@ float lpz=0;
 void chatterCallback(const geometry_msgs::PointStamped& msg)
 {
 
-  ::lpx= (msg.point.x)*10; //in mm
-  ::lpy= msg.point.y*10; //in mm
+  ::lpx= (msg.point.x); //in mm
+  ::lpy= msg.point.y; //in mm
   ::lpz= msg.point.z*1.5; //cheating here because z obtained with my caemra is not good here considering nao size
 
   cout <<"point received: "<< lpx << " , " << lpy << ", " << lpz<<"\n";
