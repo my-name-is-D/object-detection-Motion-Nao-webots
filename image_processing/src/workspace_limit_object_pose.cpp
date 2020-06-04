@@ -200,8 +200,8 @@ void objectsDetectedCallback(const std_msgs::Float32MultiArray& msg){
 			//objeto.id = id;
             p_objects.header.stamp = ros::Time::now();
             p_objects.header.frame_id =  std::to_string(id);
-            p_objects.point.x= punto.x;
-            p_objects.point.y= punto.y;
+            p_objects.point.x= punto.x*10; //to have the measurement in mm
+            p_objects.point.y= punto.y*10;
             p_objects.point.z= punto.z;
 
 
