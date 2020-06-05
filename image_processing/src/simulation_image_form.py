@@ -15,7 +15,7 @@ from geometry_msgs.msg import PointStamped, Point
 object_present= False #To check if there is an object
 
 def gray_callback(data):
-    z= 0
+    z= 12
     width=160 #x
     heigth=120 #y
 
@@ -35,7 +35,7 @@ def gray_callback(data):
     
     my_ellipse_data=detect_ellipse(gray_image,width)
     #my_circle_data= detect_circles(gray_image,width)
-    
+    """
     try:
 
         #print ('ellipse: ',my_ellipse_data)
@@ -49,6 +49,7 @@ def gray_callback(data):
         print 'distY:',my_ellipse_data[0][4]
     except IndexError:
         pass
+    """
     
     print(object_present)
     #Send data 

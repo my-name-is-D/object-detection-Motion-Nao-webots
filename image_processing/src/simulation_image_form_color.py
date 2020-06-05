@@ -176,7 +176,7 @@ def color_callback(data):
     if object_present== True and my_ellipse_data!=[]:
         width=160 #x
         heigth=120 #y
-        z=0
+        z=12
 
         position_pub = rospy.Publisher('/point', PointStamped, queue_size=1)#a Point stamped is expected, but here the id is useless. only the point will serve
         #the dtype is important to transform the data in an opencv image format
