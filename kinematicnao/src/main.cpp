@@ -14,9 +14,9 @@
 using namespace std;
 using namespace KMath::KMat;
 using namespace KDeviceLists;
-float lpx=0;
-float lpy=0;
-float lpz=0;
+float lpx=219;
+float lpy=113;
+float lpz=87;
 
 //MAIN TAKING OBJECT POSE FROM A TOPIC ("point" from image_processing launch.launch)
 //taken from noobswestand github : NAaoPythonIK and modified for ROS/my situation.
@@ -27,7 +27,7 @@ void chatterCallback(const geometry_msgs::PointStamped& msg)
 
   ::lpx= (msg.point.x); //in mm
   ::lpy= msg.point.y; //in mm
-  ::lpz= msg.point.z*1.5; //cheating here because z obtained with my caemra is not good here considering nao size
+  ::lpz= msg.point.z; //cheating here because z obtained with my caemra is not good here considering nao size
 
   cout <<"point received: "<< lpx << " , " << lpy << ", " << lpz<<"\n";
   //ROS_INFO("I heard: [%s]", msg->data.c_str());
@@ -83,7 +83,7 @@ int main(int argc, char **argv){
         lpy=30;
         lpz=0.0;
         */
-        lrx=0;//lrx+3.1415;//lrx;
+        lrx=3;//empirical observation
         lry=0;//lry;//lrz;
         lrz=0;//temp;
         /*
