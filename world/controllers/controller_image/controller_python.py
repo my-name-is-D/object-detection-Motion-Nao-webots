@@ -530,7 +530,7 @@ class Nao (Robot,Motion,PositionSensor):
             #print ("begin",self.HeadPitchS.getValue())
             self.printCameraImage(self.cameraBottom)
             #Head goes up and down, registering and sending image;
-            """
+            
             while ( abs((self.HeadPitchS.getValue()-self.HeadPitch.getMaxPosition()))>0.1 or self.HeadPitchS.getValue()<0):
                 #print ("down",self.HeadPitchS.getValue())
                 #print("check:", abs((self.HeadPitchS.getValue()-self.HeadPitch.getMaxPosition())))
@@ -550,17 +550,17 @@ class Nao (Robot,Motion,PositionSensor):
                 robot.step(20)           
                 #robot.step(75)
                 self.printCameraImage(self.cameraBottom)
-            """
             
-           
+            
+            self.printCameraImage(self.cameraBottom)
                 
             self.setAllLedsColor(0xff0000)#to check if launched corectly
                         
             #self.threadgetvalues()
             self.setHandsAngle(0.96)
             #robot.step(30)
-           
             
+         
             #ARM motion WITH CALLBACK()
             
             while (self.Larmangles==[]):
