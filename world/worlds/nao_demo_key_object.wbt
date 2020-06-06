@@ -1,0 +1,60 @@
+#VRML_SIM R2020a utf8
+WorldInfo {
+  info [
+    "Aldebaran's Nao H25 V5.0"
+    "NAO is a programmable, 57-cm tall humanoid robot."
+    "The body has 25 degrees of freedom (DOF)."
+    "The sensors include 2 cameras, 4 microphones, sonar rangefinder, 2 IR emitters and receivers, 1 inertial board, and 8 pressure sensors."
+  ]
+  title "Aldebaran's Nao"
+  basicTimeStep 20
+  FPS 20
+  contactProperties [
+    ContactProperties {
+      material1 "NAO foot material"
+      coulombFriction [
+        7
+      ]
+      bounce 0.3
+      bounceVelocity 0.003
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.3224937442255675 0.8924515093002563 0.3154807260088461 1.5978216208035774
+  position 0.7663936844407573 0.9576228699727714 0.10214707329174288
+  follow "NAO"
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+  castShadows FALSE
+}
+Floor {
+  size 5 5
+  tileSize 0.8 0.8
+}
+Nao {
+  translation 0 0.33007600000000004 1.3189044142578304e-17
+  rotation 1 3.2593242000264516e-19 1.8684298987136105e-18 -1.5708000000000002
+  controller "controller_python"
+}
+Table {
+  translation 0.96 0 0
+  size 1.8 0.3 1
+  feetSize 0.1 0.05
+  trayAppearance VarnishedPine {
+    colorOverride 1 1 1
+    textureTransform TextureTransform {
+      scale 10 10
+    }
+    IBLStrength 18
+  }
+}
+Orange {
+  translation 0.2 0.35 0.21
+}
+BallCandy {
+  translation 0.2 0.34 -0.02
+  color 0.3 0.1 0.9
+}
