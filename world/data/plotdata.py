@@ -1,10 +1,11 @@
 #! /usr/bin/env python
+from __future__ import division
 import csv
 import os
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.animation import FuncAnimation
+import math
 
 
 def armcsv():
@@ -45,25 +46,34 @@ def main():
     plt.style.use('classic')
     #ax = plt.subplots()
 
-
     time,LshoulderP,LshoulderR,LelbowY, LelbowR,LwristY=armcsv()
     timehand,Lphalanx1,Lphalanx5,Lphalanx2,Lphalanx3,Lphalanx4,Lphalanx6,Lphalanx7,Lphalanx8=handcsv()
     """
-    plt.plot(time,Lphalanx1,'-b', label='Lphalanx1/rad')
+    plt.plot(timehand,Lphalanx1,'-b', label='Lphalanx1/rad')
+    plt.plot(timehand,Lphalanx2,'-r', label='Lphalanx2/rad')
+    plt.plot(timehand,Lphalanx3,'-r', label='Lphalanx3/rad')
     plt.legend(framealpha=1, frameon=False)
     plt.show()
     """
-    
+    plt.scatter(time, LshoulderP, color='blue')
     plt.plot(time,LshoulderP,'-b', label='LShoulderPitch/rad')
+    plt.scatter(time, LshoulderR, color='red')
     plt.plot(time,LshoulderR,'--r', label='LShoulderRoll/rad')
     plt.legend(framealpha=1, frameon=False)
+    plt.title('Shoulder motion')
+    plt.ylabel('motion (rad)')
+    plt.xlabel('time (s)')
     plt.show()
-    
-    plt.plot(time,LelbowY,'--g', label='LelbowYaw/rad')   
+    plt.scatter(time, LelbowY, color='green')
+    plt.plot(time,LelbowY,'--g', label='LelbowYaw/rad')  
+    plt.scatter(time, LelbowR, color='red') 
     plt.plot(time,LelbowR,'-r', label='LelbowRoll/rad')
     plt.legend(framealpha=1, frameon=False)   
+    plt.title('Elbow motion')
+    plt.ylabel('motion (rad)')
+    plt.xlabel('time (s)')
     plt.show() 
-     
+    
     
 
 
