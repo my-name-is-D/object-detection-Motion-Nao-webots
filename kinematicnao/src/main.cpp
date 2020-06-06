@@ -14,9 +14,9 @@
 using namespace std;
 using namespace KMath::KMat;
 using namespace KDeviceLists;
-float lpx=219;
+float lpx=218;
 float lpy=113;
-float lpz=87;
+float lpz=65;
 
 //MAIN TAKING OBJECT POSE FROM A TOPIC ("point" from image_processing launch.launch)
 //taken from noobswestand github : NAaoPythonIK and modified for ROS/my situation.
