@@ -31,10 +31,11 @@ def gray_callback(data):
         gray_image[int(x/width)][x%width] = gray_image_1D[x]
     #take only the contour of the objects
     gray_image = cv2.Canny(gray_image,80,80)
-    
+    #cv2.imshow("ellipse",gray_image)
+    #cv2.waitKey(1)
     my_ellipse_data=detect_ellipse(gray_image,width)
     #my_circle_data= detect_circles(gray_image,width)
-    
+
     try:
 
         #print ('ellipse: ',my_ellipse_data)
@@ -100,8 +101,8 @@ def detect_ellipse(imgThresholded,width):
     my_ellipse_data=my_circle_data
     #print 'number of ellipses detected',number_of_circles
     #print(my_circle_data)
-    #cv2.imshow("Ellipses", imgThresholded)
-    #cv2.waitKey(1)
+    cv2.imshow("Ellipses", imgThresholded)
+    cv2.waitKey(1)
 
     #Here we send a signal saying there is an object 
     if number_of_circles>0:
@@ -178,6 +179,7 @@ def color_callback(data):
         heigth=120 #y
         z=12
 
+        my_ellipse= my_ellipse_data#to avoid that the other callback modify it while we work on it, i could use semaphore yes, but well
         position_pub = rospy.Publisher('/point', PointStamped, queue_size=1)#a Point stamped is expected, but here the id is useless. only the point will serve
         #the dtype is important to transform the data in an opencv image format
         color_image = np.zeros([heigth,width,3], dtype=np.uint8)
@@ -192,49 +194,75 @@ def color_callback(data):
         
         #cv2.imshow("image_color",color_image)
         #cv2.waitKey(1)
-        color=image_treatment(color_image,my_ellipse_data)
-        position=PointStamped()
-        position.point=Point(my_ellipse_data[0][3],my_ellipse_data[0][4], z)
-        position.header.stamp = rospy.Time.now()
-        position.header.frame_id = color
+        color=image_treatment(color_image,my_ellipse)
+        if color != "red" and color!="none":
+            position=PointStamped()
+            position.point=Point(my_ellipse[0][3],my_ellipse[0][4], z)
+            position.header.stamp = rospy.Time.now()
+            position.header.frame_id = color
         
-        position_pub.publish(position)
+            position_pub.publish(position)
     
     
 def image_treatment(color_image,my_ellipse_data):
     # define color range in RGB
     #used https://pinetools.com/image-color-picker
-    """
-    lower_red = np.array([0,100,100])
-    upper_red = np.array([179,255,255])
-    lower_green = np.array([36, 25, 25])
-    upper_green = np.array([70, 255, 255])
-    """
-    lower_yellow = np.array([190,180,50])
-    upper_yellow = np.array([255,255,225])
+    
+    lower_red = np.array([150,0,0])
+    upper_red = np.array([255,160,140])
+
+    lower_green = np.array([0, 100, 0])
+    upper_green = np.array([119, 255, 119])
+
+    lower_blue = np.array([60,60,120])
+    upper_blue = np.array([120,120,255])
+
+    lower_yellow = np.array([190,190,50])
+    upper_yellow = np.array([255,255,220])
     
     #I take only a part of the ball as a pic
     img = color_image[ int(my_ellipse_data[0][1] - my_ellipse_data[0][2]/3) : int(my_ellipse_data[0][1] + my_ellipse_data[0][2]/4) , int(my_ellipse_data[0][0] - my_ellipse_data[0][2]/3) : int(my_ellipse_data[0][0] + my_ellipse_data[0][2]/4)]
-    
+    #cv2.imshow("litt_color",img)
+    #cv2.waitKey(1)
     #I extract the mean color from the resized pic
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     #Suppose to increase the brightness of the image by 50per have no idea how
     img= cv2.add(img,np.array([50.0]))
     #extract average color in RGB
     average = img.mean(axis=0).mean(axis=0)
-    #cv2.imshow("litt_color",img)
-    #cv2.waitKey(1)
+
     print(average)
     check=0
-
     #we check if the average is in the boundaries
-    for lower,aver,upper in zip(lower_yellow,average,upper_yellow):
+    for lower,aver,upper in zip(lower_red,average,upper_red):
         if lower > aver or aver > upper:
             check+=1
     if check ==0:
-        color="yellow"
+        color="red"
     else:
-        color="none"
+        check=0
+        for lower,aver,upper in zip(lower_yellow,average,upper_yellow):
+            if lower > aver or aver > upper:
+                check+=1
+        if check ==0:
+            color="yellow"    
+    if check>0:
+        check=0
+        for lower,aver,upper in zip(lower_blue,average,upper_blue):
+            if lower > aver or aver > upper:
+                check+=1
+        if check ==0:
+            color="blue"
+    if check>0:
+        check=0
+        for lower,aver,upper in zip(lower_blue,average,upper_blue):
+            if lower > aver or aver > upper:
+                check+=1
+        if check ==0:
+            color="green"
+
+        else:
+            color="none"
         
 
     """
