@@ -41,7 +41,7 @@ def callback(data):
     #on z the dist max is 112+ 218 (from the origin, not from shoulder)
     if color == "yellow" or color == "ellipse" :
         try:
-            if not (not np.isnan(math.acos(lpx/Dist_arm)) and not np.isnan(math.asin((lpy-OffsetLY)/Dist_arm)) and not np.isnan(math.acos((lpz-OffsetLZ)/Dist_arm))
+            if y<0 and not (not np.isnan(math.acos(lpx/Dist_arm)) and not np.isnan(math.asin((lpy-OffsetLY)/Dist_arm)) and not np.isnan(math.acos((lpz-OffsetLZ)/Dist_arm))
             and not np.isnan(math.asin(lpx/Dist_arm)) ) :
                 execution= False
                 #print("1")
