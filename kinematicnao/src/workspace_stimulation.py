@@ -39,9 +39,9 @@ def callback(data):
 
     #To consider the Offset of y (on y, the dist max is 331.7 while on x it's 218)
     #on z the dist max is 112+ 218 (from the origin, not from shoulder)
-    if color == "yellow" or color == "ellipse" :
+    if not (color == "red" or color == "none") :
         try:
-            if y<0 and not (not np.isnan(math.acos(lpx/Dist_arm)) and not np.isnan(math.asin((lpy-OffsetLY)/Dist_arm)) and not np.isnan(math.acos((lpz-OffsetLZ)/Dist_arm))
+            if not (not np.isnan(math.acos(lpx/Dist_arm)) and not np.isnan(math.asin((lpy-OffsetLY)/Dist_arm)) and not np.isnan(math.acos((lpz-OffsetLZ)/Dist_arm))
             and not np.isnan(math.asin(lpx/Dist_arm)) ) :
                 execution= False
                 #print("1")
@@ -135,7 +135,7 @@ def main_func():
     #on z the dist max is 112+ 218 (from the origin, not from shoulder)
     
     try:
-        if not (not np.isnan(math.acos(lpx/Dist_arm)) and not np.isnan(math.asin((lpy-OffsetLY)/Dist_arm)) and not np.isnan(math.acos((lpz-OffsetLZ)/Dist_arm))
+        if y<0 and not (not np.isnan(math.acos(lpx/Dist_arm)) and not np.isnan(math.asin((lpy-OffsetLY)/Dist_arm)) and not np.isnan(math.acos((lpz-OffsetLZ)/Dist_arm))
         and not np.isnan(math.asin(lpx/Dist_arm)) ) :
             execution= False
             #print("1")
