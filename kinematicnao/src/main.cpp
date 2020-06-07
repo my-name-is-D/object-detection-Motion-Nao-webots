@@ -83,7 +83,7 @@ int main(int argc, char **argv){
         lpy=30;
         lpz=0.0;
         */
-        lrx=3;//empirical observation
+        lrx=0;//empirical observation
         lry=0;//lry;//lrz;
         lrz=0;//temp;
         /*
