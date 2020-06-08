@@ -497,7 +497,38 @@ class Nao (Robot,Motion,PositionSensor):
         self.thread = MyThread(self.stopFlag)
         self.thread.start()
         
-        
+    def move_with_callback(self):
+	"""
+	ARM motion WITH CALLBACK()
+	"""
+	while (self.Larmangles==[]):
+		continue
+	self.LShoulderPitch.setPosition(float(self.Larmangles[0]))
+	self.LShoulderPitch.setVelocity(4)
+	self.LShoulderPitch.setAcceleration(50)
+	self.LShoulderRoll.setPosition(float(self.Larmangles[1]))
+	self.LShoulderRoll.setVelocity(4)
+	self.LShoulderRoll.setAcceleration(self.TIMESTEP)
+	self.LElbowYaw.setPosition(float(self.Larmangles[2]))
+	self.LElbowYaw.setVelocity(4)
+	self.LElbowYaw.setAcceleration(self.TIMESTEP)
+	self.LElbowRoll.setPosition(float(self.Larmangles[3]))
+	self.LElbowRoll.setVelocity(4)
+	self.LElbowRoll.setAcceleration(self.TIMESTEP)
+
+    def move_with_file(self):
+	"""	
+	ARM motion WITH READANGLEPOSE()
+	"""
+        Larmangles=self.readanglepose()
+        self.LShoulderPitch.setPosition(float(Larmangles[0][0]))
+        #self.LShoulderPitch.setVelocity(2)
+        #self.LShoulderPitch.setAcceleration(10)
+ 
+        self.LShoulderRoll.setPosition(float(Larmangles[0][1]))
+        self.LElbowYaw.setPosition(float(Larmangles[0][2]))
+        self.LElbowRoll.setPosition(float(Larmangles[0][3]))
+
     def readanglepose(self):
         """
         When not using the camera nor the topic, retrieve the joint angle from this file (filled by kinematic nao filemain.cpp)
@@ -522,90 +553,66 @@ class Nao (Robot,Motion,PositionSensor):
         self.closeAndOpenHands(count)
         
     def run(self):
+	
         rate = rospy.Rate(0.1) 
         #self.writeobjectpose()
         
         while robot.step(self.timestep) != -1 and not rospy.is_shutdown():
             
-            #print ("begin",self.HeadPitchS.getValue())
             self.printCameraImage(self.cameraBottom)
+
+	    #we wait for the arm to get to its starting pose before doing the rest.
+	    self.move_with_callback()          
+	    
+            self.printCameraImage(self.cameraBottom)
+	    #to check any change and break the head motion (not to wait 2sec)
+
+            prev_Larmangles=self.Larmangles
             #Head goes up and down, registering and sending image;
-            
             while ( abs((self.HeadPitchS.getValue()-self.HeadPitch.getMaxPosition()))>0.1 or self.HeadPitchS.getValue()<0):
                 #print ("down",self.HeadPitchS.getValue())
                 #print("check:", abs((self.HeadPitchS.getValue()-self.HeadPitch.getMaxPosition())))
                 self.HeadPitch.setPosition(self.HeadPitch.getMaxPosition())
-                self.HeadPitch.setVelocity(0.1)
+                self.HeadPitch.setVelocity(0.3)
                 #self.HeadPitch.setAcceleration(0.2) 
-                #self.printCameraImage(self.cameraBottom) 
                 robot.step(20)
-                self.printCameraImage(self.cameraBottom)
-            
+		self.printCameraImage(self.cameraBottom)
+                if (self.Larmangles!=prev_Larmangles):
+                   break
+
+            #The motion is repeated after each while just not to lose time if there is been a ball seen;
+            self.move_with_callback()
+            self.writearmfile()
+
+            prev_Larmangles=self.Larmangles
             while (abs((self.HeadPitchS.getValue()+0.4))>0.1 or self.HeadPitchS.getValue()>0):
                 self.HeadPitch.setPosition(-0.4)
                 #print ("up",self.HeadPitchS.getValue())
-                self.HeadPitch.setVelocity(0.1)
+                self.HeadPitch.setVelocity(0.3)
                 #self.HeadPitch.setAcceleration(0.2) 
-                #self.printCameraImage(self.cameraBottom)     
+                self.printCameraImage(self.cameraBottom)     
                 robot.step(20)           
                 #robot.step(75)
-                self.printCameraImage(self.cameraBottom)
-            
+                if (prev_Larmangles!=self.Larmangles):
+                    break
             
             self.printCameraImage(self.cameraBottom)
-                
-            self.setAllLedsColor(0xff0000)#to check if launched corectly
+            #self.setAllLedsColor(0xff0000)#to check if launched corectly
                         
-            #self.threadgetvalues()
             self.setHandsAngle(0.96)
-            #robot.step(30)
-            
+            #self.setHandsAngle(0.00)
          
             #ARM motion WITH CALLBACK()
-            
-            while (self.Larmangles==[]):
-                continue
-            
-            self.LShoulderPitch.setPosition(float(self.Larmangles[0]))
-            self.LShoulderPitch.setVelocity(4)
-            self.LShoulderPitch.setAcceleration(50)
-            self.LShoulderRoll.setPosition(float(self.Larmangles[1]))
-            self.LShoulderRoll.setVelocity(4)
-            self.LShoulderRoll.setAcceleration(self.TIMESTEP)
-            self.LElbowYaw.setPosition(float(self.Larmangles[2]))
-            self.LElbowYaw.setVelocity(4)
-            self.LElbowYaw.setAcceleration(self.TIMESTEP)
-            self.LElbowRoll.setPosition(float(self.Larmangles[3]))
-            self.LElbowRoll.setVelocity(4)
-            self.LElbowRoll.setAcceleration(self.TIMESTEP)
+            self.move_with_callback()
             
             """
             #ARM motion WITH READANGLEPOSE()
-            Larmangles=self.readanglepose()
-            self.LShoulderPitch.setPosition(float(Larmangles[0][0]))
-            #self.LShoulderPitch.setVelocity(2)
-            #self.LShoulderPitch.setAcceleration(10)
- 
-            self.LShoulderRoll.setPosition(float(Larmangles[0][1]))
-            self.LElbowYaw.setPosition(float(Larmangles[0][2]))
-            self.LElbowRoll.setPosition(float(Larmangles[0][3]))
+            self.move_with_file()
             """
-            #robot.step(400)
-            #self.LShoulderPitch.setPosition(-1.6)
-            #self.setHandsAngle(0.00)
+            
             
             #print(self.RShoulderPitchS.getType())#result: nan
-
             #self.closeAndOpenHands(2)#test closeopen hand
-            """
-            self.threadgetvalues()
-            robot.step(20)
-            self.threadgetvalues()
-            robot.step(20)
-            self.threadgetvalues()
-            robot.step(200)
-            self.threadgetvalues()
-            """
              
             self.setAllLedsColor(0x0000) 
             
@@ -613,18 +620,6 @@ class Nao (Robot,Motion,PositionSensor):
             #self.writehandfile()
             #self.printCameraImage(self.cameraBottom)
 
-           
-	 # pulish ROS simulation clock -not quite succesfull-
-            """
-            msg = Clock()
-            time = robot.getTime()
-            msg.clock.secs = int(time)
-            # round prevents precision issues that can cause problems with ROS timers
-            msg.clock.nsecs = round(1000 * (time - msg.clock.secs)) * 1.0e+6
-            clockPublisher.publish(msg)
-            """
-
-            #break
             if robot.step(self.timeStep) == -1:
                 # this will stop the timer
                 self.stopFlag.set()
