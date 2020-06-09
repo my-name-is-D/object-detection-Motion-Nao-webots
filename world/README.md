@@ -23,8 +23,11 @@ roslaunch webots_ros complete.launch
 ```
 ### controller_image.py
 Same as above + Nao's head moves down and up and the bottom camera is read and the data is sent as a topic (gray image and blue image).
-Trick: the image is sent as a string, not as a multiarray. 
 If a joint position is received, the head motion is interrupted to execute the arm motion.
+
+Trick: the image is sent as a string, not as a multiarray. 
+
+
 
 ## In Motion
 handLclose and HandLOpen.motion or shooT.motion (in your world, i erased it on this github) 
