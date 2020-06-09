@@ -1,8 +1,16 @@
 # What this package does
-This package try to identify an image thanks to find_2d_object, process the object pose and extract the position according to the camera frame. Then the id of the object seen and its position x,y,z are sent as a topic. 
+This package is composed of 2 versoins.
+1. try to identify an image thanks to find_2d_object, process the object pose and extract the position according to the camera frame. Then the id of the object seen and its position x,y,z are sent as a topic. 
+2. extract from a topic an image (sent as a string in the topic) reconstruct the string into an image format then extract ellipses from the picture and calculate the simulated ball position (known size).
+If the average color of the ellipse is red (or non identified), nothing is sent back, else the color and position are sent back into a topic.
 
+1.
 ```bash
 roslaunch image_processing launch.launch
+```
+2.
+```bash
+rosrun image_processing simulation_image_form_color.py
 ```
 
 # SETUP and INFO
@@ -67,13 +75,14 @@ Also, the distance x is divided by 2, in order to have further points in the wor
 
 ### The python files
 
-#### Simulation_image.py
+#### Simulation_image_form_color.py
 This file subscribe to the topic sent by webots (the data is sent as a string because the Int32Multiarray didn't work but webots terminal didn't display errors, seriously if you can choose, gazebo is more practical if having a code adapted to a real situation is what you want, webots robots don't display topics... as would your robot).
 
-the data is transformed into an opencv image and ...
+the data is transformed into an opencv image, canny edge detection is applied and then a contour and ellipse detection is done (a circle one too, still in the code, but the ellipses give better results)
+The position of a known ball (known size) is calculated 
+Then, a part of the ellipse is prelevated and a color average is done, This color is then identified into: blue, yellow, green, red or none. 
 
-too dooooo!
-
+Then the color and position of the ball are sent in a topic.
 
 
 
