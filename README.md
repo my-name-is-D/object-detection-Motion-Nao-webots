@@ -1,5 +1,5 @@
 # object detection/motion-nao webots
-first step. Detect and extract object position. 
+first step. Detect and extract object position, one version extracts object color. 
 
 ## Image processing
 
