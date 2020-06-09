@@ -4,11 +4,11 @@ This package is composed of 2 versoins.
 2. extract from a topic an image (sent as a string in the topic) reconstruct the string into an image format then extract ellipses from the picture and calculate the simulated ball position (known size).
 If the average color of the ellipse is red (or non identified), nothing is sent back, else the color and position are sent back into a topic.
 
-1.
+1
 ```bash
 roslaunch image_processing launch.launch
 ```
-2.
+2
 ```bash
 rosrun image_processing simulation_image_form_color.py
 ```
