@@ -3,9 +3,9 @@ first step. Detect and extract object position.
 
 ## Image processing
 
-Use find_2d_object, ROS
+Use find_2d_object, ROS or OpenCv, ROS (2 versions)
 
-See objects, detect them, extract position in camera coordinates send the position and object ID as a topic (in cm). 
+See objects, detect them, extract position in camera coordinates send the position and object ID (or color) as a topic (in cm in v1 and mm in v2). 
 Either before or after a workspace filtering (if in send in topic, else it doesn't)
 
 ## kinematic nao
@@ -23,4 +23,4 @@ They can then be ploted later on with
 world/data/./plotdata
 ,,,
 
-the camera data is extracted and sent as a topic.
+the simulated camera data is extracted and sent as a topic in a string format.
