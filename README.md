@@ -19,8 +19,8 @@ A version consider Nao's workspace before calculating the angle joints.
 Subscribe to the topic publsihed by kinematic nao and move nao to the given position.
 The joint pose are recorded at given interval and stored in csv files. 
 They can then be ploted later on with 
-,,,bash
+```bash
 world/data/./plotdata
-,,,
+```
 
 the simulated camera data is extracted and sent as a topic in a string format.
