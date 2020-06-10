@@ -34,8 +34,8 @@ def gray_callback(data):
     #cv2.imshow("ellipse",gray_image)
     #cv2.waitKey(1)
     my_ellipse_data=detect_ellipse(gray_image,width)
-    #my_circle_data= detect_circles(gray_image,width)
-
+    #my_ellipse_data= detect_circles(gray_image,width)
+    """
     try:
 
         #print ('ellipse: ',my_ellipse_data)
@@ -49,8 +49,9 @@ def gray_callback(data):
         print 'distY:',my_ellipse_data[0][4]
     except IndexError:
         pass
+    """
     
-    print(object_present)
+    #print(object_present)
 
     """
     cv2.imshow("image_gray",gray_image)
@@ -60,9 +61,9 @@ def gray_callback(data):
 def detect_ellipse(imgThresholded,width):
     global object_present
     global my_ellipse_data
-    ball_real_radius_mm= 69.7 #real: 69.7
+    ball_real_radius_mm= 32.5 #in mm
     simulation_HFOV=45
-    focallenght = 80#for the fictive frame 180x120
+    focallenght = 182#for the fictive frame 180x120
     my_circle_data=[]
     number_of_circles=0 #number of circles
 
@@ -114,13 +115,15 @@ def detect_ellipse(imgThresholded,width):
  
 def detect_circles(imgThresholded, width):
     global object_present
-    ball_real_radius_mm= 69.7 #simulation ball
+    global my_ellipse_data
+    ball_real_radius_mm= 32.5 #simulation ball
     simulation_HFOV=45
-    focallenght = 75# for the fictive frame 180x120
+    focallenght = 182# for the fictive frame 180x120
     #imgThresholded=cv2.cvtColor(imgThresholded,cv2.COLOR_BGR2GRAY) #Convert the captured frame from a 3channel (BGR2HSV) to 1
     circles=cv2.HoughCircles(imgThresholded, cv2.HOUGH_GRADIENT,1, 40,param1=60, param2=20, minRadius=5, maxRadius=70) #Problem if coins are too close or too far
     number_of_circles=0 #number of circles
     my_circle_data=[]
+
     if circles is not None:
 
         #circles = np.round(circles[0, :]).astype("int")
@@ -156,6 +159,7 @@ def detect_circles(imgThresholded, width):
             pass
     #print 'number of circles detected',number_of_circles
     #Here we send a signal saying there is an object 
+    my_ellipse_data=my_circle_data
     if number_of_circles>0:
         object_present=True
     else:
@@ -177,7 +181,7 @@ def color_callback(data):
     if object_present== True and my_ellipse_data!=[]:
         width=160 #x
         heigth=120 #y
-        z=12
+        z=5
 
         my_ellipse= my_ellipse_data#to avoid that the other callback modify it while we work on it, i could use semaphore yes, but well
         position_pub = rospy.Publisher('/point', PointStamped, queue_size=1)#a Point stamped is expected, but here the id is useless. only the point will serve
@@ -195,13 +199,13 @@ def color_callback(data):
         #cv2.imshow("image_color",color_image)
         #cv2.waitKey(1)
         color=image_treatment(color_image,my_ellipse)
-        if color != "red" and color!="none":
-            position=PointStamped()
-            position.point=Point(my_ellipse[0][3],my_ellipse[0][4], z)
-            position.header.stamp = rospy.Time.now()
-            position.header.frame_id = color
-        
-            position_pub.publish(position)
+        #if color != "red" and color!="none":
+        position=PointStamped()
+        position.point=Point(my_ellipse[0][3],my_ellipse[0][4],z)
+        position.header.stamp = rospy.Time.now()
+        position.header.frame_id = color
+    
+        position_pub.publish(position)
     
     
 def image_treatment(color_image,my_ellipse_data):
@@ -212,7 +216,7 @@ def image_treatment(color_image,my_ellipse_data):
     upper_red = np.array([255,160,140])
 
     lower_green = np.array([0, 100, 0])
-    upper_green = np.array([119, 255, 119])
+    upper_green = np.array([119, 255, 130])
 
     lower_blue = np.array([60,60,120])
     upper_blue = np.array([120,120,255])
@@ -231,7 +235,7 @@ def image_treatment(color_image,my_ellipse_data):
     #extract average color in RGB
     average = img.mean(axis=0).mean(axis=0)
 
-    print(average)
+    #print(average)
     check=0
     #we check if the average is in the boundaries
     for lower,aver,upper in zip(lower_red,average,upper_red):
@@ -255,7 +259,7 @@ def image_treatment(color_image,my_ellipse_data):
             color="blue"
     if check>0:
         check=0
-        for lower,aver,upper in zip(lower_blue,average,upper_blue):
+        for lower,aver,upper in zip(lower_green,average,upper_green):
             if lower > aver or aver > upper:
                 check+=1
         if check ==0:
@@ -263,7 +267,7 @@ def image_treatment(color_image,my_ellipse_data):
 
         else:
             color="none"
-        
+    #print(color)
 
     """
     for i in average: #Actually, this for is just not to see my comments
