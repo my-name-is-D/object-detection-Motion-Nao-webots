@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import math
 import rospy
-from std_msgs.msg import Float64 
+from std_msgs.msg import Float64
 from geometry_msgs.msg import PointStamped, Point
 
 
@@ -30,42 +30,43 @@ def callback(data):
     lpz=data.point.z
 
     color=data.header.frame_id
+    print(color)
     print(lpx,lpy,lpz)
 
 
     #np.warnings.filterwarnings('ignore')#to ignore the "invalid value if arcsin not possible"
-    second_Dist_arm= Dist_arm+ OffsetLY
-    third_Dist_arm=Dist_arm+OffsetLZ
+    second_Dist_arm= Dist_arm #+ OffsetLY
+    third_Dist_arm=Dist_arm #+OffsetLZ
 
     #To consider the Offset of y (on y, the dist max is 331.7 while on x it's 218)
     #on z the dist max is 112+ 218 (from the origin, not from shoulder)
-    if not (color == "red" or color == "none") :
-        try:
-            if not (not np.isnan(math.acos(lpx/Dist_arm)) and not np.isnan(math.asin((lpy-OffsetLY)/Dist_arm)) and not np.isnan(math.acos((lpz-OffsetLZ)/Dist_arm))
-            and not np.isnan(math.asin(lpx/Dist_arm)) ) :
-                execution= False
-                #print("1")
-            if not( math.sqrt(lpx*lpx+(lpy-OffsetLY)*(lpy-OffsetLY))<= second_Dist_arm and 0<= math.acos(lpx/Dist_arm) and math.acos(lpx/Dist_arm)<=math.acos(0/Dist_arm)):
-                execution= False
-            if not (math.asin((-67-OffsetLY)/Dist_arm)<= math.asin((lpy-OffsetLY)/Dist_arm) and math.asin((lpy-OffsetLY)/Dist_arm)<=math.asin((331-OffsetLY)/Dist_arm)):
-                #0 correspond to max point when x=Dist_arm)
-                #-67 is the min y pose and 331 is the max (with offset)
-                execution= False
-                #print("2")
-            if not(math.sqrt(lpx*lpx+(lpz-OffsetLZ)*(lpz-OffsetLZ))<= third_Dist_arm):
-                execution= False
-                #print("3")
-            if not( math.acos((305.9-OffsetLZ)/Dist_arm)<= math.acos((lpz-OffsetLZ)/Dist_arm) and
-            math.acos((lpz-OffsetLZ)/Dist_arm)<=math.acos((-80-OffsetLZ)/Dist_arm) and math.asin(0/Dist_arm)<=math.asin(lpx/Dist_arm)):
-                #We don't let x go behind its back, 306 and -80 are the max and min z with offset.
-                execution= False
-                #print("4")
+    if (color == "red" or color == "none" or color=="yellow" or lpy<0 or lpx>Dist_arm) :
+        execution= False
 
-        except ValueError: #if values are too high
-            #print("test")
+    try:
+        if not (not np.isnan(math.acos(lpx/Dist_arm)) and not np.isnan(math.asin((lpy-OffsetLY)/Dist_arm)) and not np.isnan(math.acos((lpz-OffsetLZ)/Dist_arm))
+        and not np.isnan(math.asin(lpx/Dist_arm)) ) :
             execution= False
-    else:
-        execution==False
+            #print("1")
+        elif not( math.sqrt(lpx*lpx+(lpy-OffsetLY)*(lpy-OffsetLY))<= second_Dist_arm and 0<= math.acos(lpx/Dist_arm) and math.acos(lpx/Dist_arm)<=math.acos(0/Dist_arm)):
+            execution= False
+        elif not (math.asin((-67-OffsetLY)/Dist_arm)<= math.asin((lpy-OffsetLY)/Dist_arm) and math.asin((lpy-OffsetLY)/Dist_arm)<=math.asin((331-OffsetLY)/Dist_arm)):
+            #0 correspond to max point when x=Dist_arm)
+            #-67 is the min y pose and 331 is the max (with offset)
+            execution= False
+            #print("2")
+        elif not(math.sqrt(lpx*lpx+(lpz-OffsetLZ)*(lpz-OffsetLZ))<= third_Dist_arm):
+            execution= False
+            #print("3")
+        elif not( math.acos((305.9-OffsetLZ)/Dist_arm)<= math.acos((lpz-OffsetLZ)/Dist_arm) and
+        math.acos((lpz-OffsetLZ)/Dist_arm)<=math.acos((-80-OffsetLZ)/Dist_arm) and math.asin(0/Dist_arm)<=math.asin(lpx/Dist_arm)):
+            #We don't let x go behind its back, 306 and -80 are the max and min z with offset.
+            execution= False
+            #print("4")
+
+    except ValueError: #if values are too high
+        #print("test")
+        execution= False
 
     if execution == False:
         print("Object not interesting")
@@ -93,9 +94,11 @@ def readobjectpose():
         print(obpose)
     return obpose
 
-
+"""
+This function is not used anymore
+"""
 def main_func():
-    
+
     pub_stimulation = rospy.Publisher('/stimulation', Float64, queue_size=5)
 
     stimulation=0
@@ -133,7 +136,7 @@ def main_func():
 
     #To consider the Offset of y (on y, the dist max is 331.7 while on x it's 218)
     #on z the dist max is 112+ 218 (from the origin, not from shoulder)
-    
+
     try:
         if y<0 and not (not np.isnan(math.acos(lpx/Dist_arm)) and not np.isnan(math.asin((lpy-OffsetLY)/Dist_arm)) and not np.isnan(math.acos((lpz-OffsetLZ)/Dist_arm))
         and not np.isnan(math.asin(lpx/Dist_arm)) ) :
@@ -176,8 +179,8 @@ def main():
     while not rospy.is_shutdown():
         main_func()
     """
- 
+
 if __name__ == '__main__':
     main()
-    
-   
+
+

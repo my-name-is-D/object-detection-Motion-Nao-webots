@@ -96,7 +96,7 @@ int main(int argc, char **argv){
 //on z the dist max is 112+ 218 (from the origin, not from shoulder)
 
 
-        if ( y<0 && !(sqrt(lpx*lpx+(lpy-OffsetLY)*(lpy-OffsetLY))<= second_Dist_arm && 0<= acos(lpx/Dist_arm) &&
+        if (lpy<0 || !(sqrt(lpx*lpx+(lpy-OffsetLY)*(lpy-OffsetLY))<= second_Dist_arm && 0<= acos(lpx/Dist_arm) &&
          acos(lpx/Dist_arm)<=acos(0/Dist_arm) &&
          asin((-67-OffsetLY)/Dist_arm)<= asin((lpy-OffsetLY)/Dist_arm) &&
          asin((lpy-OffsetLY)/Dist_arm)<=asin((331-OffsetLY)/Dist_arm))){
