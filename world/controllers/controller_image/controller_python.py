@@ -560,12 +560,12 @@ class Nao (Robot,Motion,PositionSensor):
         while robot.step(self.timestep) != -1 and not rospy.is_shutdown():
             
             self.printCameraImage(self.cameraBottom)
-
-	    #we wait for the arm to get to its starting pose before doing the rest.
-	    self.move_with_callback()          
-	    
+            
+            #we wait for the arm to get to its starting pose before doing the rest.
+            self.move_with_callback()          
+            	    
             self.printCameraImage(self.cameraBottom)
-	    #to check any change and break the head motion (not to wait 2sec)
+            #to check any change and break the head motion (not to wait 2sec)
 
             prev_Larmangles=self.Larmangles
             #Head goes up and down, registering and sending image;
@@ -576,9 +576,10 @@ class Nao (Robot,Motion,PositionSensor):
                 self.HeadPitch.setVelocity(0.3)
                 #self.HeadPitch.setAcceleration(0.2) 
                 robot.step(20)
-		self.printCameraImage(self.cameraBottom)
+                self.printCameraImage(self.cameraBottom)
                 if (self.Larmangles!=prev_Larmangles):
-                   break
+                    self.setHandsAngle(0.96)
+                    break
 
             #The motion is repeated after each while just not to lose time if there is been a ball seen;
             self.move_with_callback()
@@ -594,12 +595,13 @@ class Nao (Robot,Motion,PositionSensor):
                 robot.step(20)           
                 #robot.step(75)
                 if (prev_Larmangles!=self.Larmangles):
+                    self.setHandsAngle(0.96)
                     break
             
             self.printCameraImage(self.cameraBottom)
             #self.setAllLedsColor(0xff0000)#to check if launched corectly
                         
-            self.setHandsAngle(0.96)
+            self.setHandsAngle(0.00)
             #self.setHandsAngle(0.00)
          
             #ARM motion WITH CALLBACK()
