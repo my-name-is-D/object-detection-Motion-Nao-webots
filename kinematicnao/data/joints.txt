@@ -1,0 +1,45 @@
+
+ color:blue x:218.65 y:113 z:65 angles: ,-0.0106,0.0104,-0.0009,-0.0199,,
+Real: x:170mm y: 10mm
+ color:green x:158.606 y:11.4764 z:5 angles: ,0.3640,-0.0895,-0.0394,-0.8483,,
+ color:green x:158.834 y:11.3451 z:5 angles: ,0.3632,-0.0921,-0.0389,-0.8435,,
+Real: x:230mm y: 30mm
+
+ color:blue x:218.65 y:113 z:65 angles: ,-0.0106,0.0104,-0.0009,-0.0199,,
+ color:green x:205.348 y:27.979 z:5 angles: ,0.3706,-1.1687,0.2241,1.5173,,
+
+real: x=170 y=-20mm
+ color:blue x:218.65 y:113 z:65 angles: ,-0.0106,0.0104,-0.0009,-0.0199,,
+ color:green x:158.388 y:-21.4638 z:5 angles: ,0.3408,-0.4382,0.0144,-0.4562,,
+
+real: x=300- 414 y= 20-20
+nothing
+
+real: x= 140 y=20
+ color:blue x:218.65 y:113 z:65 angles: ,-0.0106,0.0104,-0.0009,-0.0199,,
+ color:green x:137.033 y:25.9854 z:5 angles: ,0.4557,0.1427,-0.0905,-1.2387,,
+ color:green x:136.999 y:25.9111 z:5 angles: ,0.4557,0.1422,-0.0904,-1.2387,,
+
+-------------------------------------------------------------------------
+green x=400 y=20
+ color:green x:344.982 y:10.8986 z:5 angles: ,0.1600,-0.6570,0.0888,0.6857,, //synchro error between kine and stimu --> resolved
+ color:blue x:174.553 y:38.2744 z:5 angles: ,0.3364,0.0296,-0.0482,-0.7773,, //hand red and ball green average color: blue + in workspace, quite exceptional occurence
+
+green x=220 y=49
+1.
+ color:blue x:218.65 y:113 z:65 angles: ,-0.0106,0.0104,-0.0009,-0.0199,,
+ color:green x:199.296 y:45.0643 z:5 angles: ,0.2792,-0.2360,0.0017,-0.1515,,
+ color:green x:197.658 y:45.1764 z:5 angles: ,0.2821,-0.1945,-0.0039,-0.2335,,
+2.
+ color:blue x:218.65 y:113 z:65 angles: ,-0.0106,0.0104,-0.0009,-0.0199,,
+ color:green x:199.341 y:45.0792 z:5 angles: ,0.2791,-0.2371,0.0018,-0.1491,,
+ color:green x:155.866 y:33.5651 z:5 angles: ,0.3925,0.1172,-0.0735,-1.0447,,// the ball is displaced, and actually the robot too (by the ball contact)
+3.
+ color:blue x:218.65 y:113 z:65 angles: ,-0.0106,0.0104,-0.0009,-0.0199,,
+ color:green x:199.341 y:45.0792 z:5 angles: ,0.2791,-0.2371,0.0018,-0.1491,,
+ color:green x:150.119 y:30.6634 z:5 angles: ,0.4074,0.1246,-0.0746,-1.1063,, //perfect grasp! (ball and robot displaced)
+
+green x= 200 y=45
+ color:blue x:218.65 y:113 z:65 angles: ,-0.0106,0.0104,-0.0009,-0.0199,,
+ color:green x:181.965 y:45.4728 z:5 angles: ,0.3195,0.0218,-0.0421,-0.6778,, 
+ color:green x:181.351 y:45.6106 z:5 angles: ,0.3213,0.0287,-0.0434,-0.6912,,

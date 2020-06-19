@@ -215,14 +215,16 @@ def image_treatment(color_image,my_ellipse_data):
     lower_red = np.array([150,0,0])
     upper_red = np.array([255,160,140])
 
+    lower_yellow = np.array([190,190,50])
+    upper_yellow = np.array([255,255,220])
+
     lower_green = np.array([0, 100, 0])
-    upper_green = np.array([119, 255, 130])
+    upper_green = np.array([119, 255, 119])
 
     lower_blue = np.array([60,60,120])
     upper_blue = np.array([120,120,255])
 
-    lower_yellow = np.array([190,190,50])
-    upper_yellow = np.array([255,255,220])
+    
     
     #I take only a part of the ball as a pic
     img = color_image[ int(my_ellipse_data[0][1] - my_ellipse_data[0][2]/3) : int(my_ellipse_data[0][1] + my_ellipse_data[0][2]/4) , int(my_ellipse_data[0][0] - my_ellipse_data[0][2]/3) : int(my_ellipse_data[0][0] + my_ellipse_data[0][2]/4)]

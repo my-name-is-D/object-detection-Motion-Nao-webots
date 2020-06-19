@@ -113,6 +113,8 @@ int main(int argc, char **argv){
         if (lpx!= 218.65 and lpy!=113 and lpz!=65 ){
             starting_point=1;
         }
+
+
         if (execution==1.8 or starting_point==0){
 
             cout<<"angle sent";
