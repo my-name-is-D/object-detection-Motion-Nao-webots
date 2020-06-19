@@ -14,6 +14,13 @@ either receive the object pose as a topic or from a txt file (must be in mm, the
 transform it into angle joint and send them back as a topic.
 A version consider Nao's workspace before calculating the angle joints.
 
+##rat_model
+
+The rat model is jhielson's (see:https://github.com/jhielson) with sligh adaptations to fit my case
+
+HAVE TO ASK AUTHORISATION TO KEEP THAT IN MY GIT REP
+
+
 ## world
 
 Subscribe to the topic publsihed by kinematic nao and move nao to the given position.
