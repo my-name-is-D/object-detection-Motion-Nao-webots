@@ -1,3 +1,6 @@
+
+# Jhielson presentation of the rat_model
+
 # A biophysical model inspired by the brain structures of rats 
 
 The BG-C-T system was built using NetPyNE library and can be simulated on NEURON. 
@@ -135,6 +138,13 @@ If you would like to look for new commands to generate plots or to even manipula
 
 Using topics and service, you can share information between this model and your robot's controller. For more information about simulating NAO robot on Webots and incorporating ROS on it, please check the following repository (https://github.com/jhielson/neurorobotics_computational_environment). 
 
+
+# my changes in rat_model2.py
+
+A raster and an histogram can be plotted in the function buildSimConfig
+The average of each opulation can be retrieved in the function adjustNetworkAndCommunicateViaROS
+A stimulation is received through ros 
+A k-mean function has been implemented to determine in which cluster is the signal
 
 
 
