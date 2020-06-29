@@ -1,8 +1,11 @@
 #! /usr/bin/env python
+from __future__ import division #to have 1/10=0.1 and not 0
+
 import numpy as np
 import rospy
+import math
 import cv2
-from std_msgs.msg import String
+from std_msgs.msg import String, Float64
 from geometry_msgs.msg import PointStamped, Point
 #import re
 import matplotlib.pyplot as plt
@@ -184,6 +187,7 @@ def color_callback(data):
         z=5
 
         my_ellipse= my_ellipse_data#to avoid that the other callback modify it while we work on it, i could use semaphore yes, but well
+        pub_stimulation = rospy.Publisher('/stimulation', Float64, queue_size=5)
         position_pub = rospy.Publisher('/point', PointStamped, queue_size=1)#a Point stamped is expected, but here the id is useless. only the point will serve
         #the dtype is important to transform the data in an opencv image format
         color_image = np.zeros([heigth,width,3], dtype=np.uint8)
@@ -199,6 +203,10 @@ def color_callback(data):
         #cv2.imshow("image_color",color_image)
         #cv2.waitKey(1)
         color=image_treatment(color_image,my_ellipse)
+
+
+        stimulation=workspace_check(color,my_ellipse,z)
+
         #if color != "red" and color!="none":
         position=PointStamped()
         position.point=Point(my_ellipse[0][3],my_ellipse[0][4],z)
@@ -206,7 +214,7 @@ def color_callback(data):
         position.header.frame_id = color
     
         position_pub.publish(position)
-    
+        pub_stimulation.publish(stimulation)
     
 def image_treatment(color_image,my_ellipse_data):
     # define color range in RGB
@@ -332,6 +340,69 @@ def image_treatment(color_image,my_ellipse_data):
     #print(color)
     return color
     
+def workspace_check(color,my_ellipse,z):
+    stimulation=0
+    execution= True
+    ShoulderOffsetZ=75.0
+    ShoulderOffsetY=98.0
+    ElbowOffsetY=15.0
+    UpperArmLength=105.0
+    LowerArmLength=57.7
+    HandOffsetX=55.95
+    HandOffsetZ=12.31
+    Dist_arm=HandOffsetX+UpperArmLength+LowerArmLength #219
+    OffsetLY= ShoulderOffsetY+ElbowOffsetY#113
+    OffsetLZ=ShoulderOffsetZ+HandOffsetZ #112
+
+    lpx=my_ellipse[0][3]
+    lpy=my_ellipse[0][4]
+    lpz=z
+
+    print(color)
+    print(lpx,lpy,lpz)
+
+
+    #np.warnings.filterwarnings('ignore')#to ignore the "invalid value if arcsin not possible"
+    second_Dist_arm= Dist_arm #+ OffsetLY
+    third_Dist_arm=Dist_arm #+OffsetLZ
+
+    #To consider the Offset of y (on y, the dist max is 331.7 while on x it's 218)
+    #on z the dist max is 112+ 218 (from the origin, not from shoulder)
+    if (color == "red" or color == "none" or color=="yellow" or lpy<0 or lpx>Dist_arm) :
+        execution= False
+
+    try:
+        if not (not np.isnan(math.acos(lpx/Dist_arm)) and not np.isnan(math.asin((lpy-OffsetLY)/Dist_arm)) and not np.isnan(math.acos((lpz-OffsetLZ)/Dist_arm))
+        and not np.isnan(math.asin(lpx/Dist_arm)) ) :
+            execution= False
+            #print("1")
+        elif not( math.sqrt(lpx*lpx+(lpy-OffsetLY)*(lpy-OffsetLY))<= second_Dist_arm and 0<= math.acos(lpx/Dist_arm) and math.acos(lpx/Dist_arm)<=math.acos(0/Dist_arm)):
+            execution= False
+        elif not (math.asin((-67-OffsetLY)/Dist_arm)<= math.asin((lpy-OffsetLY)/Dist_arm) and math.asin((lpy-OffsetLY)/Dist_arm)<=math.asin((331-OffsetLY)/Dist_arm)):
+            #0 correspond to max point when x=Dist_arm)
+            #-67 is the min y pose and 331 is the max (with offset)
+            execution= False
+            #print("2")
+        elif not(math.sqrt(lpx*lpx+(lpz-OffsetLZ)*(lpz-OffsetLZ))<= third_Dist_arm):
+            execution= False
+            #print("3")
+        elif not( math.acos((305.9-OffsetLZ)/Dist_arm)<= math.acos((lpz-OffsetLZ)/Dist_arm) and
+        math.acos((lpz-OffsetLZ)/Dist_arm)<=math.acos((-80-OffsetLZ)/Dist_arm) and math.asin(0/Dist_arm)<=math.asin(lpx/Dist_arm)):
+            #We don't let x go behind its back, 306 and -80 are the max and min z with offset.
+            execution= False
+            #print("4")
+
+    except ValueError: #if values are too high
+        #print("test")
+        execution= False
+
+    if execution == False:
+        print("Object not interesting")
+        stimulation=0.0012
+    else:
+        print("Object interesting")
+        stimulation=0.003
+    return stimulation
 
 def main():
     rospy.init_node('simulation_image', anonymous=True)
