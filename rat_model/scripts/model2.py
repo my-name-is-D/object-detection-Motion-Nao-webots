@@ -30,6 +30,7 @@ class Network:
                  n_neurons=10, seed=10):
 
         # Variables
+        #print("in the init")
         self.seed= random.seed(seed)
         self.pd = has_pd
         self.dbs = dbs
@@ -56,26 +57,29 @@ class Network:
         # Rate (Hz)
         self.loop_rate = rospy.Rate(1)
         #Publisher
-        self.pub=rospy.Publisher('/avpoprates',list_pop, queue_size=100)
+        self.pub=rospy.Publisher('/brainoutstimu',list_pop, queue_size=100)
 
     def kmean_function(self):
         #Kmean initialization based on a fixed dataset (extendable)
         import pandas as pd
         # Importing the dataset
-        dataset = pd.read_csv('../data/pd_stimu.csv')
+        dataset = pd.read_csv('/home/cata/nao_ws/src/rat_model/data/pd_stimu.csv')
         X = dataset.iloc[:, [0, 1]].values
+        #print("in the Kmean")
         # Have to determine the first centroid else they will be randomly distributed
         init_centroid= dataset.iloc[:4, [2, 3]].values #here i take the average of each "cluster"
         kmeans = KMeans(n_clusters = 4, init = init_centroid, random_state = 42)
         kmeans.fit_predict(X)
+        #print("after kmean")
         return kmeans
 
 
     def neuralModel(self,data):
         # Modify stimulus
         # we receive amplitude from the subscriber and send it in the TH of the model.
-
+        #print("in the callback")
         self.amplitude= data.data
+        #print(self.amplitude)
         self.init= True #Once the modification is confirmed we continue
         """
         if data.data == 1.8:
@@ -831,15 +835,15 @@ if __name__ == '__main__':
         # ROS
         rospy.init_node('neural_model_rat', anonymous=False)
         # Create network
-        pd = 0
+        pd = 1
         print("Parkinson?: ", pd)
-        #while not rospy.is_shutdown():
-        my_seed=np.random.uniform(-1,100)
-        print("my seed: ",my_seed)
-        
-        network = Network(t_sim = 2000, has_pd=pd, seed=my_seed) #90000
+        while not rospy.is_shutdown():
+            my_seed=np.random.uniform(-1,100)
+            #print("my seed: ",my_seed)
+    
+            network = Network(t_sim = 2000, has_pd=pd, seed=my_seed) #90000
         # Simulate 
-        network.simulate(pd, dt = 0.1, lfp = False, interval = 100) #1000
+            network.simulate(pd, dt = 0.1, lfp = False, interval = 100) #1000
         
     except rospy.ROSInterruptException:
         pass
