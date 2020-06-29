@@ -26,7 +26,7 @@ from threading import Timer,Thread,Event
 from controller import Motor, TouchSensor, PositionSensor
 from controller import Robot, Keyboard, Motion
 from std_msgs.msg import Float64, String, Int32MultiArray, Int8
-
+from rat_model.msg import interference
 #from rosgraph_msgs.msg import Clock
 #--synchronize
 
@@ -103,7 +103,11 @@ class Nao (Robot,Motion,PositionSensor):
             
             print(data.data)
       
-        
+    def interferencecallback(self,data):
+        self.musclesvelocity=data.interference[1]
+        self.musclesacc= data.interference[0]
+        print("self.musclesvelocity and acc",self.musclesvelocity, self.musclesacc)
+          
     def loadMotionFiles(self):
         """
         You can send pre-determined motions to the simulated nao, here you retrieve those files
@@ -169,9 +173,9 @@ class Nao (Robot,Motion,PositionSensor):
         # read rgb pixel values from the camera
         image = camera.getImage()
         
-        print('----------camera image (gray levels)---------')
-        print('original resolution: %d x %d, scaled to %d x %f'
-              % (width, height, width / scaled, height / scaled))
+        #print('----------camera image (gray levels)---------')
+        #print('original resolution: %d x %d, scaled to %d x %f'
+        #      % (width, height, width / scaled, height / scaled))
 
         #self.image_matrix_gray = [0 for x in range(0,(width // scaled)* (height // scaled))] 
         #self.image_matrix_blue = [0 for x in range(0,(width // scaled)* (height // scaled))]  
@@ -474,7 +478,8 @@ class Nao (Robot,Motion,PositionSensor):
         self.handsensor=[]
         self.Larmangles=[] #to obtain muscle angle from callback
         self.sample=0 #to know how many time we sampled the sensors
-        
+        self.musclesvelocity=4
+        self.musclesacc=50
         # initialize stuff
         self.findAndEnableDevices()
         self.loadMotionFiles()
@@ -493,6 +498,7 @@ class Nao (Robot,Motion,PositionSensor):
         
         rospy.Subscriber("jointangles",String, self.jointcallback)#o get the rad of the motion
         #MyThread class initialization 
+        rospy.Subscriber("/interference",interference,self.interferencecallback)
         self.stopFlag = Event()
         self.thread = MyThread(self.stopFlag)
         self.thread.start()
@@ -504,17 +510,17 @@ class Nao (Robot,Motion,PositionSensor):
 	while (self.Larmangles==[]):
 		continue
 	self.LShoulderPitch.setPosition(float(self.Larmangles[0]))
-	self.LShoulderPitch.setVelocity(4)
-	self.LShoulderPitch.setAcceleration(50)
+	self.LShoulderPitch.setVelocity(self.musclesvelocity)
+	self.LShoulderPitch.setAcceleration(self.musclesacc)
 	self.LShoulderRoll.setPosition(float(self.Larmangles[1]))
-	self.LShoulderRoll.setVelocity(4)
-	self.LShoulderRoll.setAcceleration(self.TIMESTEP)
+	self.LShoulderRoll.setVelocity(self.musclesvelocity)
+	self.LShoulderRoll.setAcceleration(self.musclesacc)
 	self.LElbowYaw.setPosition(float(self.Larmangles[2]))
-	self.LElbowYaw.setVelocity(4)
-	self.LElbowYaw.setAcceleration(self.TIMESTEP)
+	self.LElbowYaw.setVelocity(self.musclesvelocity)
+	self.LElbowYaw.setAcceleration(self.musclesacc)
 	self.LElbowRoll.setPosition(float(self.Larmangles[3]))
-	self.LElbowRoll.setVelocity(4)
-	self.LElbowRoll.setAcceleration(self.TIMESTEP)
+	self.LElbowRoll.setVelocity(self.musclesvelocity)
+	self.LElbowRoll.setAcceleration(self.musclesacc)
 
     def move_with_file(self):
 	"""	
@@ -536,7 +542,7 @@ class Nao (Robot,Motion,PositionSensor):
         Larmangles=[]
         #print("in")
         while (Larmangles == []):
-            with open("/home/cata/nao_ws/src/world/data/anglejoint_static.txt","r") as file2:
+            with open("/home/cata/nao_ws/src/thesis/world/data/anglejoint_static.txt","r") as file2:
                 for line in file2:
                     List = [elt.strip() for elt in line.split(',')]
                     Larmangles.append(List)
@@ -575,11 +581,13 @@ class Nao (Robot,Motion,PositionSensor):
                 self.HeadPitch.setPosition(self.HeadPitch.getMaxPosition())
                 self.HeadPitch.setVelocity(0.3)
                 #self.HeadPitch.setAcceleration(0.2) 
+                self.threadgetvalues()
                 robot.step(20)
                 self.printCameraImage(self.cameraBottom)
-                if (self.Larmangles!=prev_Larmangles):
-                    self.setHandsAngle(0.96)
-                    break
+                self.move_with_callback()
+                #if (self.Larmangles!=prev_Larmangles):
+                #    self.setHandsAngle(0.96)
+                #    break
 
             #The motion is repeated after each while just not to lose time if there is been a ball seen;
             self.move_with_callback()
@@ -591,12 +599,14 @@ class Nao (Robot,Motion,PositionSensor):
                 #print ("up",self.HeadPitchS.getValue())
                 self.HeadPitch.setVelocity(0.3)
                 #self.HeadPitch.setAcceleration(0.2) 
-                self.printCameraImage(self.cameraBottom)     
-                robot.step(20)           
+                self.printCameraImage(self.cameraBottom)   
+                self.threadgetvalues()  
+                robot.step(20)  
+                self.move_with_callback()         
                 #robot.step(75)
-                if (prev_Larmangles!=self.Larmangles):
-                    self.setHandsAngle(0.96)
-                    break
+                #if (prev_Larmangles!=self.Larmangles):
+                #    self.setHandsAngle(0.96)
+                #    break
             
             self.printCameraImage(self.cameraBottom)
             #self.setAllLedsColor(0xff0000)#to check if launched corectly
