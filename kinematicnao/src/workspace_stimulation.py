@@ -169,12 +169,12 @@ def main_func():
         stimulation=0.0012
     else:
         print("Object interesting")
-        stimulation=0.0018
+        stimulation=0.003
     pub_stimulation.publish(stimulation)
 def main():
     rospy.init_node("stimulation_decision")
     #Final code
-    
+    """
     rospy.Subscriber('/point',PointStamped, callback)
     rospy.spin()
     """
@@ -182,7 +182,7 @@ def main():
     
     while not rospy.is_shutdown():
         main_func()
-    """
+    
 
 if __name__ == '__main__':
     main()

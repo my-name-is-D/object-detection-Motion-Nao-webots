@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+
+
+
+
+
+<launch>
+
+   <node name="stimulation_decision" pkg="kinematicnao" type="workspace_stimulation.py" output="screen" />
+ <node name="simulation_image" pkg="image_processing" type="simulation_image_form_color.py" output="screen" />   
+ <node name="talker" pkg="kinematicnao" type="mainworkspace_decomposition" output="screen" />
+
+
+</launch>
+
