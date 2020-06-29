@@ -40,3 +40,15 @@ Note: the workspace is a simplified version of Nao's workspace
 
 
 The workspace_stimulation.py is the python version of the workspace limitation, it send a binary stimulation if the point is in or out of the workspace
+
+### V4
+
+The object position is retrieved from a topic, the stimulation and muscle error comes from another (brain model's receives 1 or 0 to indicate a stimulation and the error associated to it (PD))
+The endpoint is decomposed in several sub_motion to be able to send perturbation to the muscles (or not) according to the brain status (Pd/healthy)
+
+```bash
+roslaunch kinematicnao mainworkspace_decomposition.launch 
+```
+
+
+
