@@ -50,5 +50,10 @@ The endpoint is decomposed in several sub_motion to be able to send perturbation
 roslaunch kinematicnao mainworkspace_decomposition.launch 
 ```
 
+## the python file
+
+Is the workspace determination and the stimulation signal sent to the rat_model.
+If ball is of the right color and in the workspace: stimulation, else not.
+This python will probably be integrated in another python to diminuish the number of topics
 
 
