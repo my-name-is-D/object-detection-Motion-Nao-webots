@@ -15,6 +15,8 @@
 #include "std_msgs/String.h"
 #include "std_msgs/Float64.h"
 #include "KinematicsDefines.h"
+#include "KinematicsDefines.h"
+#include <rat_model/list_pop.h>
 using namespace std;
 using namespace KMath::KMat;
 using namespace KDeviceLists;
@@ -22,8 +24,8 @@ string color("blue");
 float lpx=218.65; //be wary, if you change here you also have to change something down, check it out
 float lpy=113;
 float lpz=65;
-double execution= 1.2;
-
+double execution= 0;
+float error=0;
 
 //MAIN TAKING OBJECT POSE FROM A TOPIC ("point" from image_processing launch.launch)
 //taken from noobswestand github : NAaoPythonIK and modified for ROS/my situation.
@@ -42,12 +44,19 @@ void chatterCallback(const geometry_msgs::PointStamped& msg)
 
 void stimuCallback(const std_msgs::Float64& msg)
 {
-
+//First stimulation reception, when no brain model. Used to test prototype 2, the motion according to a stimulation (and synchonise files)
  ::execution= msg.data;
-  cout <<"kinematic stimulation received: "<<  execution << "\n";
+  //cout <<"kinematic stimulation received: "<<  execution << "\n";
   //ROS_INFO("I heard: [%s]", msg->data.c_str());
 }
+void stimulationcallback(const rat_model::list_pop &msg){
+    //cout<<"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXIIIIIIIMMMMTHHHHEEEEEERRRREEEEEEEE CAAAN YOUUU SEEEEEEEE MMMMEEEEEEEE?";
+    ::execution=msg.popaveragerate[0];
+    ::error=msg.popaveragerate[1];
+    cout<<"stimulation: "<< execution <<", error: "<<error;
 
+
+}
 float clamp(float x, float min, float max){
     if (x<min){x=min;}
     if (x>max){x=max;}
@@ -81,7 +90,9 @@ int main(int argc, char **argv){
     ros::Publisher chatter_pub = n.advertise<std_msgs::String>("jointangles", 1000);
     ros::Subscriber sub = n.subscribe("point", 1000, chatterCallback);
     ros::Subscriber sub2 = n.subscribe("/stimulation", 1000, stimuCallback);
+    ros::Subscriber sub3 = n.subscribe("/brainoutstimu", 1000,stimulationcallback);
     ros::Rate loop_rate(10);
+
 	NAOKinematics nkin;
 	NAOKinematics::kmatTable output1, output2;
     string writedatapath="/home/cata/nao_ws/src/kinematicnao/data/joints_decompo.txt";
@@ -94,7 +105,7 @@ int main(int argc, char **argv){
 
     //to get a random float
     boost::random::mt19937 gen;
-    boost::random::uniform_real_distribution<float> dist(-0.1001, 0.1001);
+
     //float prevangle[4] ={0,0,0,0};
     //std::vector<float> prevangle(4,0);
 
@@ -129,9 +140,12 @@ int main(int argc, char **argv){
         }
 
 
-        if (execution==1.8 or starting_point==0){
+        if (execution==1 or starting_point==0){
             if (not(prevlpx==lpx and prevlpy==lpy and prevlpz==lpz)or starting_point==0){
-                for (unsigned int div=6; div>0; div--){
+
+                for (unsigned int div=8; div>0; div--){
+                    //+0.0001 because it can't take 0
+                    boost::random::uniform_real_distribution<float> dist(-abs(error),abs(error+0.0001));//-0.1001, 0.1001);
                     stringstream fullstream;
                     if (starting_point==0){ //don't want to divide the first goal
                         div=1;
@@ -141,9 +155,9 @@ int main(int argc, char **argv){
                     float ly=lpy-prevlpy;
                     float lz=lpz-prevlpz;
 
-                    output1(0,3)=(prevlpx+lx/div)+(std::rand() % 5) ;//350;  //forward/backward
-                    output1(1,3)=prevlpy+ly/div+std::rand() % 5;//320; //side to side
-                    output1(2,3)=prevlpz+lz/div+std::rand() % 5;//200+100; //up/down
+                    output1(0,3)=(prevlpx+lx/div);//+(std::rand() % 5) ;//350;  //forward/backward
+                    output1(1,3)=prevlpy+ly/div;//+std::rand() % 5;//320; //side to side
+                    output1(2,3)=prevlpz+lz/div;//+std::rand() % 5;//200+100; //up/down
                     if (div==1){
                         prevlpx=lpx;
                         prevlpy=lpy;
@@ -194,10 +208,13 @@ int main(int argc, char **argv){
 
                         for(unsigned int j=0; j<result[0].size(); j++){
                             stringstream stream;
-                            float error=dist(gen);
-                            //cout<<"ERRRRROOOOOOOOOORRRRRRR :"<< error<<"\n";
+                            /*if (error>0){
+                                float merror=dist(gen);
+                            }*/
+                            float merror=dist(gen);
+                            //cout<<"ERRRRROOOOOOOOOORRRRRRR :"<< merror<<"\n";
                             //cout << "angle" << j << " = " << result[0][j]/div << " ";
-                            stream << fixed << setprecision(4) << result[0][j];//+error;
+                            stream << fixed << setprecision(4) << result[0][j]+merror;
                             fullstream<<stream.str()<<",";
 
                             //if (div==1){ //if the ball pose is updated it will move from the prev pose to the next
