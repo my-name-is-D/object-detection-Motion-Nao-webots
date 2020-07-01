@@ -45,7 +45,14 @@ void chatterCallback(const geometry_msgs::PointStamped& msg)
 void stimuCallback(const std_msgs::Float64& msg)
 {
 //First stimulation reception, when no brain model. Used to test prototype 2, the motion according to a stimulation (and synchonise files)
- ::execution= msg.data;
+ //TEST UNIT
+/*
+ if (msg.data==0.0012){
+    ::execution=0;}
+ else{
+    ::execution=1;
+    }*/
+
   //cout <<"kinematic stimulation received: "<<  execution << "\n";
   //ROS_INFO("I heard: [%s]", msg->data.c_str());
 }
@@ -103,8 +110,7 @@ int main(int argc, char **argv){
     float prevlpy=0;
     float prevlpz=0;
 
-    //to get a random float
-    boost::random::mt19937 gen;
+
 
     //float prevangle[4] ={0,0,0,0};
     //std::vector<float> prevangle(4,0);
@@ -138,15 +144,15 @@ int main(int argc, char **argv){
         if (lpx!= 218.65 and lpy!=113 and lpz!=65 ){
             starting_point=1;
         }
-
-
+        //to get a random float
+        boost::random::mt19937 gen;
+        boost::random::uniform_real_distribution<float> dist(-abs(error/3),abs(error/3+0.0001));//-0.1001, 0.1001);
         if (execution==1 or starting_point==0){
             if (not(prevlpx==lpx and prevlpy==lpy and prevlpz==lpz)or starting_point==0){
-
-                for (unsigned int div=8; div>0; div--){
+                stringstream fullstream;
+                for (unsigned int div=16; div>0; div--){
                     //+0.0001 because it can't take 0
-                    boost::random::uniform_real_distribution<float> dist(-abs(error),abs(error+0.0001));//-0.1001, 0.1001);
-                    stringstream fullstream;
+
                     if (starting_point==0){ //don't want to divide the first goal
                         div=1;
                     }
@@ -212,7 +218,7 @@ int main(int argc, char **argv){
                                 float merror=dist(gen);
                             }*/
                             float merror=dist(gen);
-                            //cout<<"ERRRRROOOOOOOOOORRRRRRR :"<< merror<<"\n";
+                            cout<<"ERRRRROOOOOOOOOORRRRRRR :"<< merror<<"\n";
                             //cout << "angle" << j << " = " << result[0][j]/div << " ";
                             stream << fixed << setprecision(4) << result[0][j]+merror;
                             fullstream<<stream.str()<<",";
@@ -232,9 +238,9 @@ int main(int argc, char **argv){
                         read.close();
                     }//if not empty
                 msg.data = fullstream.str();
+                 }//for div
                 chatter_pub.publish(msg);
                 ros::Duration(0.05).sleep(); // sleep in second
-                 }//for div
                 }//if not = prev
         }//end if execution
 
