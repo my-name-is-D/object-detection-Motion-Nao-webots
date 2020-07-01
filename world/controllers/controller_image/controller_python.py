@@ -30,7 +30,6 @@ from rat_model.msg import interference
 #from rosgraph_msgs.msg import Clock
 #--synchronize
 
-
 #-----------------------NAO CLASS-------------------------#
 
 
@@ -75,30 +74,30 @@ class Nao (Robot,Motion,PositionSensor):
         This function retrieve the angle of the robot (rad) from a topic send from kinematicnao and store them in an array.
         It also check if the angles are realisable. 
         """
-         
+        #print(self.LElbowYaw.getMaxPosition()) 
         if not ( data.data =="POSITION NOT REACHABLE"):
             self.Larmangles = data.data .split(',')
-            
-            if (float(self.Larmangles[0])> self.LShoulderPitch.getMaxPosition()):
-                self.Larmangles[0]=self.LShoulderPitch.getMaxPosition()
-            elif (float(self.Larmangles[0])< self.LShoulderPitch.getMinPosition()):
-                self.Larmangles[0]=self.LShoulderPitch.getMinPosition()
-            
-            if (float(self.Larmangles[1])> self.LShoulderRoll.getMaxPosition()):
-                self.Larmangles[1]=self.LShoulderRoll.getMaxPosition()
-            elif (float(self.Larmangles[1])< self.LShoulderRoll.getMinPosition()):
-                self.Larmangles[1]=self.LShoulderRoll.getMinPosition()    
+            for i in xrange(0,len(self.Larmangles)-1,4):
+                if (float(self.Larmangles[i])> self.LShoulderPitch.getMaxPosition()):
+                    self.Larmangles[i]=self.LShoulderPitch.getMaxPosition()
+                elif (float(self.Larmangles[i])< self.LShoulderPitch.getMinPosition()):
+                    self.Larmangles[i]=self.LShoulderPitch.getMinPosition()
                 
-            if (float(self.Larmangles[2])> self.LElbowYaw.getMaxPosition()):
-                self.Larmangles[2]=self.LElbowYaw.getMaxPosition()
-            elif (float(self.Larmangles[2])< self.LElbowYaw.getMinPosition()):
-                self.Larmangles[2]=self.LElbowYaw.getMinPosition()   
-            
-            if (float(self.Larmangles[3])> self.LElbowRoll.getMaxPosition()):
-                self.Larmangles[3]=self.LElbowRoll.getMaxPosition()
-            elif (float(self.Larmangles[3])< self.LElbowRoll.getMinPosition()):
-                self.Larmangles[3]=self.LElbowRoll.getMinPosition()       
-            print(self.Larmangles)    
+                if (float(self.Larmangles[i+1])> self.LShoulderRoll.getMaxPosition()):
+                    self.Larmangles[i+1]=self.LShoulderRoll.getMaxPosition()
+                elif (float(self.Larmangles[i+1])< self.LShoulderRoll.getMinPosition()):
+                    self.Larmangles[i+1]=self.LShoulderRoll.getMinPosition()    
+                    
+                if (float(self.Larmangles[i+2])> self.LElbowYaw.getMaxPosition()):
+                    self.Larmangles[i+2]=self.LElbowYaw.getMaxPosition()
+                elif (float(self.Larmangles[i+2])< self.LElbowYaw.getMinPosition()):
+                    self.Larmangles[i+2]=self.LElbowYaw.getMinPosition()   
+                
+                if (float(self.Larmangles[i+3])> self.LElbowRoll.getMaxPosition()):
+                    self.Larmangles[i+3]=self.LElbowRoll.getMaxPosition()
+                elif (float(self.Larmangles[i+3])< self.LElbowRoll.getMinPosition()):
+                    self.Larmangles[i+3]=self.LElbowRoll.getMinPosition()       
+                print(self.Larmangles)    
         else:
             
             print(data.data)
@@ -477,6 +476,7 @@ class Nao (Robot,Motion,PositionSensor):
         self.jointsensor=[] #to obtain muscle pos
         self.handsensor=[]
         self.Larmangles=[] #to obtain muscle angle from callback
+        self.prev_Larmangles=[]
         self.sample=0 #to know how many time we sampled the sensors
         self.musclesvelocity=4
         self.musclesacc=50
@@ -504,23 +504,37 @@ class Nao (Robot,Motion,PositionSensor):
         self.thread.start()
         
     def move_with_callback(self):
-	"""
-	ARM motion WITH CALLBACK()
-	"""
-	while (self.Larmangles==[]):
-		continue
-	self.LShoulderPitch.setPosition(float(self.Larmangles[0]))
-	self.LShoulderPitch.setVelocity(self.musclesvelocity)
-	self.LShoulderPitch.setAcceleration(self.musclesacc)
-	self.LShoulderRoll.setPosition(float(self.Larmangles[1]))
-	self.LShoulderRoll.setVelocity(self.musclesvelocity)
-	self.LShoulderRoll.setAcceleration(self.musclesacc)
-	self.LElbowYaw.setPosition(float(self.Larmangles[2]))
-	self.LElbowYaw.setVelocity(self.musclesvelocity)
-	self.LElbowYaw.setAcceleration(self.musclesacc)
-	self.LElbowRoll.setPosition(float(self.Larmangles[3]))
-	self.LElbowRoll.setVelocity(self.musclesvelocity)
-	self.LElbowRoll.setAcceleration(self.musclesacc)
+        """
+        ARM motion WITH CALLBACK()
+        """
+        while (self.Larmangles==[]):
+            continue
+        if (self.prev_Larmangles!=self.Larmangles):
+            
+            for i in xrange(0,len(self.Larmangles)-1,4):
+                #print(len(self.Larmangles))
+                #print("\n IIIIIIIII",i)
+                self.LShoulderPitch.setPosition(float(self.Larmangles[i]))
+                self.LShoulderPitch.setVelocity(self.musclesvelocity)
+                self.LShoulderPitch.setAcceleration(self.musclesacc)
+                self.LShoulderRoll.setPosition(float(self.Larmangles[i+1]))
+                self.LShoulderRoll.setVelocity(self.musclesvelocity)
+                self.LShoulderRoll.setAcceleration(self.musclesacc)
+                self.LElbowYaw.setPosition(float(self.Larmangles[i+2]))
+                self.LElbowYaw.setVelocity(self.musclesvelocity)
+                self.LElbowYaw.setAcceleration(self.musclesacc)
+                self.LElbowRoll.setPosition(float(self.Larmangles[i+3]))
+                self.LElbowRoll.setVelocity(self.musclesvelocity)
+                self.LElbowRoll.setAcceleration(self.musclesacc)
+                #print("shoulder pitch R and wanted:",self.LShoulderPitchS.getValue(),float(self.Larmangles[i]))
+                    
+                
+                while (abs(self.LShoulderPitchS.getValue()-float(self.Larmangles[i]))>0.1 or abs(self.LShoulderRollS.getValue()-float(self.Larmangles[i+1]))>0.1 or abs(self.LElbowYawS.getValue()-float(self.Larmangles[i+2]))>0.1 or  abs(self.LElbowRollS.getValue()-float(self.Larmangles[i+3]))>0.1):
+                    robot.step(5)
+                    print(" ")#savior print... 
+                    #print("shoulder pitch R and wanted:",self.LShoulderPitchS.getValue(),float(self.Larmangles[i]))
+                    #continue
+                self.prev_Larmangles=self.Larmangles
 
     def move_with_file(self):
 	"""	
@@ -572,8 +586,9 @@ class Nao (Robot,Motion,PositionSensor):
             	    
             self.printCameraImage(self.cameraBottom)
             #to check any change and break the head motion (not to wait 2sec)
-
+            
             prev_Larmangles=self.Larmangles
+            self.setHandsAngle(0.96)
             #Head goes up and down, registering and sending image;
             while ( abs((self.HeadPitchS.getValue()-self.HeadPitch.getMaxPosition()))>0.1 or self.HeadPitchS.getValue()<0):
                 #print ("down",self.HeadPitchS.getValue())
@@ -658,7 +673,7 @@ rospy.init_node('controller', anonymous=True)
 
 # we want to use simulation time for ROS
 #clockPublisher = rospy.Publisher('clock', Clock, queue_size=1)
-#CameraPublisher = rospy.Publisher('cameradata',
+
 if not rospy.get_param('use_sim_time', False):
     rospy.logwarn('use_sim_time is not set!')
 
