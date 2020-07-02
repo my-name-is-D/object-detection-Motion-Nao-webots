@@ -150,21 +150,23 @@ int main(int argc, char **argv){
         if (execution==1 or starting_point==0){
             if (not(prevlpx==lpx and prevlpy==lpy and prevlpz==lpz)or starting_point==0){
                 stringstream fullstream;
-                for (unsigned int div=16; div>0; div--){
+		    
+		unsigned int div_number=16    
+		float lx=(lpx-prevlpx)/div_number;
+                float ly=(lpy-prevlpy)/div_number;
+                float lz=(lpz-prevlpz)/div_number;
+                for (unsigned int div=1; div<=div_number; div++){
                     //+0.0001 because it can't take 0
 
                     if (starting_point==0){ //don't want to divide the first goal
-                        div=1;
+                        div=div_number;
                     }
                     cout<<"angle sent";
-                    float lx=lpx-prevlpx;
-                    float ly=lpy-prevlpy;
-                    float lz=lpz-prevlpz;
-
-                    output1(0,3)=(prevlpx+lx/div);//+(std::rand() % 5) ;//350;  //forward/backward
-                    output1(1,3)=prevlpy+ly/div;//+std::rand() % 5;//320; //side to side
-                    output1(2,3)=prevlpz+lz/div;//+std::rand() % 5;//200+100; //up/down
-                    if (div==1){
+                    
+                    output1(0,3)=(prevlpx+lx*div);//+(std::rand() % 5) ;//350;  //forward/backward
+                    output1(1,3)=prevlpy+ly*div;//+std::rand() % 5;//320; //side to side
+                    output1(2,3)=prevlpz+lz*div;//+std::rand() % 5;//200+100; //up/down
+                    if (div==div_number){
                         prevlpx=lpx;
                         prevlpy=lpy;
                         prevlpz=lpz;
