@@ -48,7 +48,7 @@ class Network:
         # Variables to calculate ISIs(InterSpikes Interval)
         self.one_second_data = [[],[],[],[],[],[],[],[],[],[]]
         #kmean initialization
-        self.kmeans=self.kmean_function()
+        #self.kmeans=self.kmean_function()
         #Subscriber
         rospy.Subscriber('/stimulation',Float64, self.neuralModel)
         
@@ -834,7 +834,62 @@ class Network:
         # Check time
         self.current_interval = time
         #print("current interval", time)
+        
+        sim.gatherData()        
 
+        # Count spikes: cortex neurons        
+        countSpikes = 0
+        for i in range(self.previous_interval,len(sim.allSimData['spkid'])):
+            spike_id = sim.allSimData['spkid'][i]
+            #cortex R region
+            if spike_id >= 50 and spike_id < 60:
+                countSpikes += 1
+                pos = int(spike_id%50)
+                self.one_second_data[pos].append(sim.allSimData['spkt'][i])
+        #print("one sec",self.one_second_data)
+        #print("first data",self.one_second_data[0][0])
+        #print("len one_sec",len(self.one_second_data))
+
+        # Calculate the average FR (firing rate) of Cortex neurons
+        mean_FR = countSpikes/10.0
+        #print("mean_fr 100ms",mean_FR)
+        self.mean_FR_list.append(mean_FR)
+        # Calculate ISIs
+        isis_mean = np.zeros(10)
+        isis_std  = np.zeros(10)
+        isis = [[],[],[],[],[],[],[],[],[],[]]
+        for i in range(0,10):
+            for t in range(0,len(self.one_second_data[i])):
+                #print("my i and ttttt",i,t)
+                if t>0:
+                    diff = self.one_second_data[i][t]-self.one_second_data[i][t-1]
+                    #print("diff",diff)
+                    isis[i].append(diff)
+            if len(isis[i]) > 0:
+                isis_mean[i] = np.mean(isis[i])
+                isis_std[i] = np.std(isis[i])
+            else:
+                isis_mean[i] = 0
+                isis_std[i] = 0
+
+        # Calculate the mean values of cortex neurons
+        isis_mean_ctx = np.mean(isis_mean)
+        isis_std_ctx = np.mean(isis_std)
+        print(self.current_interval)
+        if self.current_interval>=400:
+            #print("isi mean",isis_mean_ctx)
+            diff_mean=isis_mean_ctx-self.isis_mean_ctx
+            diff_std=isis_std_ctx-self.isis_std_ctx
+            #print("DIFF ISI mean -PREV ISIS MEAN",diff_mean)
+            #print("DIFF ISI STD -PREV ISIS MEAN",diff_std)
+            self.diff_mean_list.append(diff_mean)
+            self.diff_std_list.append(diff_std)
+            #self.writecsv(isis_mean_ctx,isis_std_ctx)
+
+        self.isis_mean_ctx=isis_mean_ctx
+        self.isis_std_ctx=isis_std_ctx
+        # Save position for the next second          
+        self.previous_interval = len(sim.allSimData['spkid'])
         """
         LAST RUN
         """
@@ -843,39 +898,69 @@ class Network:
             # Collect Data
             sim.gatherData()
 
+            # Variables to calculate ISIs(InterSpikes Interval)
+            one_second_data = [[],[],[],[],[],[],[],[],[],[]]
+
+            # Count spikes: cortex neurons        
+            countSpikes = 0
+            for i in range(0,len(sim.allSimData['spkid'])):
+                spike_id = sim.allSimData['spkid'][i]
+                #cortex R region
+                if spike_id >= 50 and spike_id < 60:
+                    countSpikes += 1
+                    pos = int(spike_id%50)
+                    one_second_data[pos].append(sim.allSimData['spkt'][i])
+
+            # Save position for the next second          
+            #self.previous_interval = len(sim.allSimData['spkid'])
+
+            # Calculate the average FR (firing rate) of Cortex neurons
+            mean_FR = countSpikes/10.0
+
+            # Calculate ISIs
+            isis_mean = np.zeros(10)
+            isis_std  = np.zeros(10)
+            isis = [[],[],[],[],[],[],[],[],[],[]]
+            for i in range(0,10):
+                for t in range(0,len(one_second_data[i])):
+                    if t>0:
+                        diff = one_second_data[i][t]-one_second_data[i][t-1]
+                        isis[i].append(diff)
+                if len(isis[i]) > 0:
+                    isis_mean[i] = np.mean(isis[i])
+                    isis_std[i] = np.std(isis[i])
+                else:
+                    isis_mean[i] = 0
+                    isis_std[i] = 0
+
+            # Calculate the mean values of cortex neurons
+            # Calculate the mean values of cortex neurons
+            isis_mean_ctx = round(np.mean(isis_mean),4)
+            isis_std_ctx = round(np.mean(isis_std),4)
+            """
+            mean_isis_mean_ctx = np.mean(self.diff_mean_list)
+            mean_isis_std_ctx = np.mean(self.diff_std_list)
+            std_isis_mean_ctx = np.std(self.diff_mean_list)
+            std_isis_std_ctx = np.std(self.diff_std_list)            
+            var_isis_mean_ctx = np.var(self.diff_mean_list)
+            var_isis_std_ctx = np.var(self.diff_std_list)
+            #print(self.diff_mean_list)
+            print("mean firing each 100ms",np.mean(self.mean_FR_list))
+            print("std firing each 100ms",np.std(self.mean_FR_list))
+            print("ISIS MEAN CTX: ",isis_mean_ctx)
+            print("ISIS STD CTX: ",isis_std_ctx)
+            print("mean diff mean ctx",mean_isis_mean_ctx)
+            print("mean diff std ctx",mean_isis_std_ctx)
+            print("std diff mean ctx",std_isis_mean_ctx)
+            print("std diff std ctx",std_isis_std_ctx)
+            print("var diff mean ctx",var_isis_mean_ctx)
+            print("var diff std ctx",var_isis_std_ctx)
+            """
+            self.writecsv(isis_mean_ctx,isis_std_ctx)
             # Plot a raster
             sim.analysis.plotData()
             #sim.analysis.plotRaster()
-            
-            # Do the analyses
-            info=np.array([[self.pd,sim.allSimData.popRates['CTX_RS']]]) 
-            #print(info)
-            result=int(self.kmeans.predict(info))
-            #print(result)
-            
-            if result ==1: #pd/non stimulated
-                cluster_centroid=round(self.kmeans.cluster_centers_[result][1],2)
-                self.avpopratesregions.append(0)  #stimulation
-                self.avpopratesregions.append(sim.allSimData.popRates['CTX_RS']-cluster_centroid) #error
-            elif result ==2: #healthy/stimulated
-                self.avpopratesregions.append(1) #stimulation
-                self.avpopratesregions.append(0) #error
-            elif result ==3: #pd/stimulated
-                cluster_centroid=round(self.kmeans.cluster_centers_[result][1],2)
-                self.avpopratesregions.append(1)
-                self.avpopratesregions.append(sim.allSimData.popRates['CTX_RS']-cluster_centroid)
-            else: #if result ==0 then healthy/non stimulated
-                self.avpopratesregions.append(0)
-                self.avpopratesregions.append(0)
-            #extract average population rates
-        
-            """
-            for item, value in sim.allSimData.popRates.items():
-                #print("poprates",item,value)
-                self.avpopratesregions.append(value)
-            #extract global average rate
-            #print("averagepop",sim.allSimData.avgRate)
-            """
+           
             print("message sent to the muscles:",self.avpopratesregions )
             # Send the new information via ROS
             self.pub.publish(self.avpopratesregions)
@@ -888,8 +973,8 @@ if __name__ == '__main__':
         # Create network
         pd = 0
         print("Parkinson?: ", pd)
-        while not rospy.is_shutdown():
-        #for i in range(50):
+        #while not rospy.is_shutdown():
+        for i in range(50):
             my_seed=np.random.uniform(-1,100)
             #print("my seed: ",my_seed)
 
