@@ -3,6 +3,7 @@
 
 
 import random
+import csv
 from netpyne import specs, sim
 from scipy import signal
 import numpy as np
@@ -35,10 +36,19 @@ class Network:
         self.pd = has_pd
         self.dbs = dbs
         self.t_sim = t_sim
-        self.amplitude=1.2
+        self.amplitude=0
         self.init=False
+        # Variable used to count spikes
+        self.previous_interval = 0
+        self.isis_mean_ctx=0
+        self.isis_std_ctx=0
+        self.diff_mean_list=[]
+        self.diff_std_list=[]
+        self.mean_FR_list=[]
+        # Variables to calculate ISIs(InterSpikes Interval)
+        self.one_second_data = [[],[],[],[],[],[],[],[],[],[]]
         #kmean initialization
-        self.kmeans=self.kmean_function()
+        #self.kmeans=self.kmean_function()
         #Subscriber
         rospy.Subscriber('/stimulation',Float64, self.neuralModel)
         
@@ -77,8 +87,9 @@ class Network:
     def neuralModel(self,data):
         # Modify stimulus
         # we receive amplitude from the subscriber and send it in the TH of the model.
-        #print("in the callback")
+        
         self.amplitude= data.data
+        #print("STIMULATION RECEIVED",self.amplitude)
         #print(self.amplitude)
         self.init= True #Once the modification is confirmed we continue
         """
@@ -743,7 +754,7 @@ class Network:
         simConfig.saveFileStep = 1 # step size in ms to save data to disk
         simConfig.savePickle = False # save to pickle file
         simConfig.saveJson = False # save to json file
-        simConfig.saveMat = True # save to mat file
+        simConfig.saveMat = False # save to mat file
         simConfig.saveTxt = True # save to txt file
         simConfig.saveDpk = False # save to .dpk pickled file
         simConfig.saveHDF5 = False # save to HDF5 file
@@ -756,7 +767,7 @@ class Network:
         
 
         #simConfig.analysis['plotRaster'] = {'saveFig': 'tut6_raster.png'}  # Plot a raster
-        simConfig.analysis['plotRaster'] = {'include': [('CTX_RS')], 'spikeHist':'overlay','popRates': 'True', 'showFig':'False', 'saveFig': 'spikehisto.png'}
+        #simConfig.analysis['plotRaster'] = {'include': [('CTX_RS')], 'spikeHist':'overlay','popRates': 'True', 'showFig':'False', 'saveFig': 'spikehisto.png'}
         return simConfig
 
     def simulate(self, has_pd=1, dt=0.1, lfp=False, interval = 1000):
@@ -784,19 +795,172 @@ class Network:
 
         # Save        
         sim.saveData()
-        
+    def writecsv(self,isis_mean_ctx,isis_std_ctx):
+        filename = '/home/cata/nao_ws/src/rat_model/data/pd_stimu.csv'
+        # writing to csv file  
+        mean_isis_mean_ctx = round(np.mean(self.diff_mean_list),4)
+        mean_isis_std_ctx = round(np.mean(self.diff_std_list),4)
+        std_isis_mean_ctx = round(np.std(self.diff_mean_list),4)
+        std_isis_std_ctx = round(np.std(self.diff_std_list),4)           
+        var_isis_mean_ctx = round(np.var(self.diff_mean_list),4)
+        var_isis_std_ctx = round(np.var(self.diff_std_list),4)
+        meam_meanFR=round(np.mean(self.mean_FR_list),4)
+        std_meanFR =round(np.std(self.mean_FR_list),4)
+        #print(self.diff_mean_list)
+        """
+        print("mean firing each 100ms",meam_meanFR)
+        print("std firing each 100ms",std_meanFR)
+        print("ISIS MEAN CTX: ",isis_mean_ctx)
+        print("ISIS STD CTX: ",isis_std_ctx)
+        print("mean diff mean ctx",mean_isis_mean_ctx)
+        print("mean diff std ctx",mean_isis_std_ctx)
+        print("std diff mean ctx",std_isis_mean_ctx)
+        print("std diff std ctx",std_isis_std_ctx)
+        print("var diff mean ctx",var_isis_mean_ctx)
+        print("var diff std ctx",var_isis_std_ctx)
+        """
+        row=[sim.allSimData.popRates['CTX_RS'],isis_mean_ctx,isis_std_ctx,mean_isis_mean_ctx,mean_isis_std_ctx,std_isis_mean_ctx,
+        std_isis_std_ctx,var_isis_mean_ctx,var_isis_std_ctx,meam_meanFR,std_meanFR,self.seed]
+
+        with open(filename, 'a') as csvfile:  
+            # creating a csv writer object  
+            csvwriter = csv.writer(csvfile)  
+            
+            # writing the fields  
+            csvwriter.writerow(row)  
+
+
     def adjustNetworkAndCommunicateViaROS(self,time,):
         # Check time
         self.current_interval = time
         #print("current interval", time)
-         
+        
+        sim.gatherData()        
+
+        # Count spikes: cortex neurons        
+        countSpikes = 0
+        for i in range(self.previous_interval,len(sim.allSimData['spkid'])):
+            spike_id = sim.allSimData['spkid'][i]
+            #cortex R region
+            if spike_id >= 50 and spike_id < 60:
+                countSpikes += 1
+                pos = int(spike_id%50)
+                self.one_second_data[pos].append(sim.allSimData['spkt'][i])
+        #print("one sec",self.one_second_data)
+        #print("first data",self.one_second_data[0][0])
+        #print("len one_sec",len(self.one_second_data))
+
+        # Calculate the average FR (firing rate) of Cortex neurons
+        mean_FR = countSpikes/10.0
+        #print("mean_fr 100ms",mean_FR)
+        self.mean_FR_list.append(mean_FR)
+        # Calculate ISIs
+        isis_mean = np.zeros(10)
+        isis_std  = np.zeros(10)
+        isis = [[],[],[],[],[],[],[],[],[],[]]
+        for i in range(0,10):
+            for t in range(0,len(self.one_second_data[i])):
+                #print("my i and ttttt",i,t)
+                if t>0:
+                    diff = self.one_second_data[i][t]-self.one_second_data[i][t-1]
+                    #print("diff",diff)
+                    isis[i].append(diff)
+            if len(isis[i]) > 0:
+                isis_mean[i] = np.mean(isis[i])
+                isis_std[i] = np.std(isis[i])
+            else:
+                isis_mean[i] = 0
+                isis_std[i] = 0
+
+        # Calculate the mean values of cortex neurons
+        isis_mean_ctx = np.mean(isis_mean)
+        isis_std_ctx = np.mean(isis_std)
+        print(self.current_interval)
+        if self.current_interval>=400:
+            #print("isi mean",isis_mean_ctx)
+            diff_mean=isis_mean_ctx-self.isis_mean_ctx
+            diff_std=isis_std_ctx-self.isis_std_ctx
+            #print("DIFF ISI mean -PREV ISIS MEAN",diff_mean)
+            #print("DIFF ISI STD -PREV ISIS MEAN",diff_std)
+            self.diff_mean_list.append(diff_mean)
+            self.diff_std_list.append(diff_std)
+            #self.writecsv(isis_mean_ctx,isis_std_ctx)
+
+        self.isis_mean_ctx=isis_mean_ctx
+        self.isis_std_ctx=isis_std_ctx
+        # Save position for the next second          
+        self.previous_interval = len(sim.allSimData['spkid'])
+        """
+        LAST RUN
+        """
         #we only gather and publish data at the last interval.
         if self.t_sim<= self.current_interval+0.1:
             # Collect Data
             sim.gatherData()
+
+            # Variables to calculate ISIs(InterSpikes Interval)
+            one_second_data = [[],[],[],[],[],[],[],[],[],[]]
+
+            # Count spikes: cortex neurons        
+            countSpikes = 0
+            for i in range(0,len(sim.allSimData['spkid'])):
+                spike_id = sim.allSimData['spkid'][i]
+                #cortex R region
+                if spike_id >= 50 and spike_id < 60:
+                    countSpikes += 1
+                    pos = int(spike_id%50)
+                    one_second_data[pos].append(sim.allSimData['spkt'][i])
+
+            # Save position for the next second          
+            #self.previous_interval = len(sim.allSimData['spkid'])
+
+            # Calculate the average FR (firing rate) of Cortex neurons
+            mean_FR = countSpikes/10.0
+
+            # Calculate ISIs
+            isis_mean = np.zeros(10)
+            isis_std  = np.zeros(10)
+            isis = [[],[],[],[],[],[],[],[],[],[]]
+            for i in range(0,10):
+                for t in range(0,len(one_second_data[i])):
+                    if t>0:
+                        diff = one_second_data[i][t]-one_second_data[i][t-1]
+                        isis[i].append(diff)
+                if len(isis[i]) > 0:
+                    isis_mean[i] = np.mean(isis[i])
+                    isis_std[i] = np.std(isis[i])
+                else:
+                    isis_mean[i] = 0
+                    isis_std[i] = 0
+
+            # Calculate the mean values of cortex neurons
+            # Calculate the mean values of cortex neurons
+            isis_mean_ctx = round(np.mean(isis_mean),4)
+            isis_std_ctx = round(np.mean(isis_std),4)
+            """
+            mean_isis_mean_ctx = np.mean(self.diff_mean_list)
+            mean_isis_std_ctx = np.mean(self.diff_std_list)
+            std_isis_mean_ctx = np.std(self.diff_mean_list)
+            std_isis_std_ctx = np.std(self.diff_std_list)            
+            var_isis_mean_ctx = np.var(self.diff_mean_list)
+            var_isis_std_ctx = np.var(self.diff_std_list)
+            #print(self.diff_mean_list)
+            print("mean firing each 100ms",np.mean(self.mean_FR_list))
+            print("std firing each 100ms",np.std(self.mean_FR_list))
+            print("ISIS MEAN CTX: ",isis_mean_ctx)
+            print("ISIS STD CTX: ",isis_std_ctx)
+            print("mean diff mean ctx",mean_isis_mean_ctx)
+            print("mean diff std ctx",mean_isis_std_ctx)
+            print("std diff mean ctx",std_isis_mean_ctx)
+            print("std diff std ctx",std_isis_std_ctx)
+            print("var diff mean ctx",var_isis_mean_ctx)
+            print("var diff std ctx",var_isis_std_ctx)
+            """
+            self.writecsv(isis_mean_ctx,isis_std_ctx)
             # Plot a raster
             sim.analysis.plotData()
             #sim.analysis.plotRaster()
+            """
             # Do the analyses
             info=np.array([[self.pd,sim.allSimData.popRates['CTX_RS']]]) 
             #print(info)
@@ -819,13 +983,14 @@ class Network:
                 self.avpopratesregions.append(0)
             #extract average population rates
             """
+            """
             for item, value in sim.allSimData.popRates.items():
                 #print("poprates",item,value)
                 self.avpopratesregions.append(value)
             #extract global average rate
             #print("averagepop",sim.allSimData.avgRate)
             """
-        
+            print("message sent to the muscles:",self.avpopratesregions )
             # Send the new information via ROS
             self.pub.publish(self.avpopratesregions)
             self.avpopratesregions=[] #usefull if ran in loops
@@ -835,13 +1000,14 @@ if __name__ == '__main__':
         # ROS
         rospy.init_node('neural_model_rat', anonymous=False)
         # Create network
-        pd = 1
+        pd = 0
         print("Parkinson?: ", pd)
-        while not rospy.is_shutdown():
+        #while not rospy.is_shutdown():
+        for i in range(50):
             my_seed=np.random.uniform(-1,100)
             #print("my seed: ",my_seed)
-    
-            network = Network(t_sim = 2000, has_pd=pd, seed=my_seed) #90000
+
+            network = Network(t_sim = 800, has_pd=pd, seed=my_seed) #90000
         # Simulate 
             network.simulate(pd, dt = 0.1, lfp = False, interval = 100) #1000
         
