@@ -59,6 +59,8 @@ roslaunch kinematicnao mainworkspace_decomposition.launch
 
 In this version all the sub motions, received noises and the arm joints corresponding are saved in a txt file: joints_decompo.txt (saved in world/data/kinematic_joints/joints_decompo.txt)
 
+Also, this launch also launchs the simulation_image_form_color.py from image_processing.
+
 ## the python file
 
 Is the workspace determination and the stimulation signal sent to the rat_model.
