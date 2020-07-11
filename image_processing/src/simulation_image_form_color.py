@@ -7,9 +7,9 @@ import math
 import cv2
 from std_msgs.msg import String, Float64
 from geometry_msgs.msg import PointStamped, Point
-#import re
 import matplotlib.pyplot as plt
-#READ BELLOW TO ADAPT TO REAL NAO
+
+#READ BELLOW TO READAPT CODE (TO REAL NAO for eg)
 #TO READAPT in case of change: width/height image(px), camera focal length(px), ball radius(mm), the H field of view (degree).
 
 #the image Width and Height are fixed in the callback, if the scale change in the webots controller_python, the value in gray_callback have to be changed.
@@ -32,29 +32,12 @@ def gray_callback(data):
     #transform the 1D list into a 2D array
     for x in range(0, width*heigth):
         gray_image[int(x/width)][x%width] = gray_image_1D[x]
+    
     #take only the contour of the objects
     gray_image = cv2.Canny(gray_image,80,80)
-    #cv2.imshow("ellipse",gray_image)
-    #cv2.waitKey(1)
+
     my_ellipse_data=detect_ellipse(gray_image,width)
     #my_ellipse_data= detect_circles(gray_image,width)
-    """
-    try:
-
-        #print ('ellipse: ',my_ellipse_data)
-        #print ('circle: ',my_circle_data)
-        #print 'centre x and y of the circle: ', my_circle_data[0][0],', ',my_circle_data[0][1]
-        print 'centre x and y of the ellips: ', my_ellipse_data[0][0],', ',my_ellipse_data[0][1]
-        #print 'radius circle: ',my_circle_data[0][2]
-        print 'radius ellips: ',my_ellipse_data[0][2]
-        #print 'distance ball circle (mm): ', my_circle_data[0][3]
-        print 'distance ball ellips (mm): ', my_ellipse_data[0][3]
-        print 'distY:',my_ellipse_data[0][4]
-    except IndexError:
-        pass
-    """
-    
-    #print(object_present)
 
     """
     cv2.imshow("image_gray",gray_image)
@@ -64,19 +47,24 @@ def gray_callback(data):
 def detect_ellipse(imgThresholded,width):
     global object_present
     global my_ellipse_data
+
     ball_real_radius_mm= 32.5 #in mm
     simulation_HFOV=45
     focallenght = 182#for the fictive frame 180x120
+    
+    
     my_circle_data=[]
     number_of_circles=0 #number of circles
 
+    #extract the contour out of the grayscale
     contours, hierarchy = cv2.findContours(imgThresholded, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
     
     for cnt in contours:
         area = cv2.contourArea(cnt) #to check size
         #print(area)
-        if area < 40 or len(cnt) < 5 or area >7000:  #to get rid of the noises and interference 
+        if area < 40 or len(cnt) < 5 or area >7000:  #to get rid of the noises and false positive
             continue
+
         #(x,y),(MA,ma),angle = cv2.fitEllipse(cnt) #not practical to use
         ellipse = cv2.fitEllipse(cnt)
 
@@ -85,26 +73,25 @@ def detect_ellipse(imgThresholded,width):
 
         Ma= ellipse[1][0] #long axe
         ma= ellipse[1][1] #little axe
-        r1=Ma/2 
-        r2=ma/2
+        r1=Ma/2 #radius 1
+        r2=ma/2 #radius 2 (it's an ellipse, not a circle)
         x=ellipse[0][0]
         y=ellipse[0][1]
         r=(((r1**2+r2**2)/2)**0.5) #we assume we have some kind of circle
+        
+        #X
         distance= focallenght* ball_real_radius_mm/r
         
         #angley = -1*((simulation_HFOV*(x/width)-(width/2))) #find the angle of view of the object (in x)
         #dY= distance*np.sin(angley*np.pi/180)
         dY=-1*(x- width/2)#no px rectification here because we use the simulation camera, each px are a perfect squared unit.
         number_of_circles=1+number_of_circles
-        #print 'centre x and y of the circle: ', x,', ',y
-        """
-        print 'radius: ',r
-        print 'distance ball (mm): ', distance
-        """
+        
         my_circle_data.append([x,y,r,distance,dY])
+
+
     my_ellipse_data=my_circle_data
-    #print 'number of ellipses detected',number_of_circles
-    #print(my_circle_data)
+
     cv2.imshow("Ellipses", imgThresholded)
     cv2.waitKey(1)
 
@@ -115,7 +102,9 @@ def detect_ellipse(imgThresholded,width):
         object_present=False
 
     return my_circle_data
- 
+"""
+function not used, alternative to ellipse
+""" 
 def detect_circles(imgThresholded, width):
     global object_present
     global my_ellipse_data
@@ -123,6 +112,7 @@ def detect_circles(imgThresholded, width):
     simulation_HFOV=45
     focallenght = 182# for the fictive frame 180x120
     #imgThresholded=cv2.cvtColor(imgThresholded,cv2.COLOR_BGR2GRAY) #Convert the captured frame from a 3channel (BGR2HSV) to 1
+    
     circles=cv2.HoughCircles(imgThresholded, cv2.HOUGH_GRADIENT,1, 40,param1=60, param2=20, minRadius=5, maxRadius=70) #Problem if coins are too close or too far
     number_of_circles=0 #number of circles
     my_circle_data=[]
@@ -187,25 +177,22 @@ def color_callback(data):
         z=5
 
         my_ellipse= my_ellipse_data#to avoid that the other callback modify it while we work on it, i could use semaphore yes, but well
-        pub_stimulation = rospy.Publisher('/stimulation', Float64, queue_size=5)
+        
         position_pub = rospy.Publisher('/point', PointStamped, queue_size=1)#a Point stamped is expected, but here the id is useless. only the point will serve
         #the dtype is important to transform the data in an opencv image format
         color_image = np.zeros([heigth,width,3], dtype=np.uint8)
         
-        #transform the string into a 1D list
-        #color_image_1D = re.split(r'[[ ]]', data.data)
         color_image_1D = data.data.split(' ')
 
         #transform the 1D list into a 2D array BGR image
         for x in range(0, width*heigth*3):
             color_image[int(x/(width*3))][int(x/3)%(width)][x%3] = color_image_1D[x]
         
-        #cv2.imshow("image_color",color_image)
-        #cv2.waitKey(1)
+        #extract the ball color
         color=image_treatment(color_image,my_ellipse)
 
-
-        stimulation=workspace_check(color,my_ellipse,z)
+        #check if we are in the workspace and color is stimulating
+        workspace_check(color,my_ellipse,z)
 
         #if color != "red" and color!="none":
         position=PointStamped()
@@ -214,7 +201,7 @@ def color_callback(data):
         position.header.frame_id = color
     
         position_pub.publish(position)
-        pub_stimulation.publish(stimulation)
+        
     
 def image_treatment(color_image,my_ellipse_data):
     # define color range in RGB
@@ -231,21 +218,17 @@ def image_treatment(color_image,my_ellipse_data):
 
     lower_blue = np.array([60,60,120])
     upper_blue = np.array([120,120,255])
-
-    
-    
+ 
     #I take only a part of the ball as a pic
     img = color_image[ int(my_ellipse_data[0][1] - my_ellipse_data[0][2]/3) : int(my_ellipse_data[0][1] + my_ellipse_data[0][2]/4) , int(my_ellipse_data[0][0] - my_ellipse_data[0][2]/3) : int(my_ellipse_data[0][0] + my_ellipse_data[0][2]/4)]
-    #cv2.imshow("litt_color",img)
-    #cv2.waitKey(1)
+    
     #I extract the mean color from the resized pic
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-    #Suppose to increase the brightness of the image by 50per have no idea how
+    #Iincrease the brightness of the image by 50per 
     img= cv2.add(img,np.array([50.0]))
     #extract average color in RGB
     average = img.mean(axis=0).mean(axis=0)
 
-    #print(average)
     check=0
     #we check if the average is in the boundaries
     for lower,aver,upper in zip(lower_red,average,upper_red):
@@ -277,10 +260,11 @@ def image_treatment(color_image,my_ellipse_data):
 
         else:
             color="none"
-    #print(color)
+    
 
     """
-    for i in average: #Actually, this for is just not to see my comments
+    #TESTS 
+    for i in blabla: #Actually, this for is just not to see my comments
         
         #TEST 1 to get the dominant color (and average color)
         pixels = np.float32(img.reshape(-1, 3))
@@ -337,12 +321,15 @@ def image_treatment(color_image,my_ellipse_data):
         k = cv2.waitKey(5) & 0xFF
         
     """
-    #print(color)
+   
     return color
     
 def workspace_check(color,my_ellipse,z):
+    pub_stimulation = rospy.Publisher('/stimulation', Float64, queue_size=5)
+
     stimulation=0
     execution= True
+    #kinematic sizes, would be cleaner to get them from KinematicsDefines.h file (but that was faster, will do it later)
     ShoulderOffsetZ=75.0
     ShoulderOffsetY=98.0
     ElbowOffsetY=15.0
@@ -357,20 +344,22 @@ def workspace_check(color,my_ellipse,z):
     lpx=my_ellipse[0][3]
     lpy=my_ellipse[0][4]
     lpz=z
-
+    """
     print(color)
     print(lpx,lpy,lpz)
-
+    """
 
     #np.warnings.filterwarnings('ignore')#to ignore the "invalid value if arcsin not possible"
+    
+    #To consider the Offset of y (on y, the dist max is 331.7 while on x it's 218)
+    #on z the dist max is 112+ 218 (from the origin, not from shoulder)
     second_Dist_arm= Dist_arm #+ OffsetLY
     third_Dist_arm=Dist_arm #+OffsetLZ
 
-    #To consider the Offset of y (on y, the dist max is 331.7 while on x it's 218)
-    #on z the dist max is 112+ 218 (from the origin, not from shoulder)
+    #IF COLOR NOT STIMULATING OR Y AND X TOO LOW OR HIGH --> no stimulation
     if (color == "red" or color == "none" or color=="yellow" or lpy<0 or lpx>Dist_arm) :
         execution= False
-
+    # Nao Workspace check
     try:
         if not (not np.isnan(math.acos(lpx/Dist_arm)) and not np.isnan(math.asin((lpy-OffsetLY)/Dist_arm)) and not np.isnan(math.acos((lpz-OffsetLZ)/Dist_arm))
         and not np.isnan(math.asin(lpx/Dist_arm)) ) :
@@ -393,16 +382,16 @@ def workspace_check(color,my_ellipse,z):
             #print("4")
 
     except ValueError: #if values are too high
-        #print("test")
         execution= False
 
     if execution == False:
-        print("Object not interesting")
+        print("Object not interesting : 0.0012A")
         stimulation=0.0012
     else:
-        print("Object interesting")
-        stimulation=0.003
-    return stimulation
+        print("Object interesting : 0.0035A")
+        stimulation=0.0035
+    pub_stimulation.publish(stimulation)
+    
 
 def main():
     rospy.init_node('simulation_image', anonymous=True)
@@ -410,8 +399,6 @@ def main():
 
     rospy.Subscriber('gray_image',String, gray_callback)
     rospy.Subscriber('blue_image',String, color_callback)
-    if object_present==True:
-        image_treatment()
 
     cv2.destroyAllWindows()
 if __name__ == '__main__':
