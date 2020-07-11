@@ -15,8 +15,10 @@ from std_msgs.msg import Float64
 from rat_model.msg import list_pop
 import rospy
 from std_msgs.msg import Float64MultiArray,String
-from sklearn.cluster import KMeans
 
+#from sklearn.cluster import KMeans
+data_filename= '/home/cata/nao_ws/src/world/data/Rat_model/pd_stimu_data_ANN.csv'
+write_filename = '/home/cata/nao_ws/src/world/data/Rat_model/pd_stimu.csv'
 
 class Network:
     class Spikes:
@@ -37,23 +39,25 @@ class Network:
         self.dbs = dbs
         self.t_sim = t_sim
         self.amplitude=0
-        self.init=False
+        
+        self.init=False #Until it's true (callback stimulated) no run
         # Variable used to count spikes
+        """
         self.previous_interval = 0
+        
         self.isis_mean_ctx=0
         self.isis_std_ctx=0
+        
         self.diff_mean_list=[]
         self.diff_std_list=[]
         self.mean_FR_list=[]
+        """
         # Variables to calculate ISIs(InterSpikes Interval)
-        self.one_second_data = [[],[],[],[],[],[],[],[],[],[]]
+        #self.one_second_data = [[],[],[],[],[],[],[],[],[],[]]
         #kmean initialization
-        #self.kmeans=self.kmean_function()
+        self.ann=self.ANN_function()
         #Subscriber
         rospy.Subscriber('/stimulation',Float64, self.neuralModel)
-        
-        
-
         # Parameters
         self.netParams = self.buildNetParams()
         self.buildPopulationParameters()
@@ -62,27 +66,50 @@ class Network:
         self.buildCellConnRules()
         self.buildStimParams()
         self.avpopratesregions=[]
-
+        
         #ROS
         # Rate (Hz)
         self.loop_rate = rospy.Rate(1)
         #Publisher
         self.pub=rospy.Publisher('/brainoutstimu',list_pop, queue_size=100)
-
-    def kmean_function(self):
+    
+    def ANN_function(self):
+        global data_filename
         #Kmean initialization based on a fixed dataset (extendable)
         import pandas as pd
         # Importing the dataset
-        dataset = pd.read_csv('/home/cata/nao_ws/src/rat_model/data/pd_stimu.csv')
-        X = dataset.iloc[:, [0, 1]].values
-        #print("in the Kmean")
-        # Have to determine the first centroid else they will be randomly distributed
-        init_centroid= dataset.iloc[:4, [2, 3]].values #here i take the average of each "cluster"
-        kmeans = KMeans(n_clusters = 4, init = init_centroid, random_state = 42)
-        kmeans.fit_predict(X)
-        #print("after kmean")
-        return kmeans
+        dataset = pd.read_csv(data_filename)
 
+        X = dataset.iloc[:, :3].values
+        y = dataset.iloc[:, [3,4]].values #if PD + stimu
+
+        # Splitting the dataset into the Training set and Test set
+        from sklearn.model_selection import train_test_split
+        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+
+        # Feature Scaling
+        #Multi-layer Perceptron is sensitive to feature scaling
+        from sklearn.preprocessing import StandardScaler
+        self.sc = StandardScaler()
+        X_train = self.sc.fit_transform(X_train)
+        #X_test = sc.transform(X_test)
+    
+        from sklearn.neural_network import MLPClassifier
+        #For small datasets, however, lbfgs can converge faster and perform better
+        #activation is relu
+        #lbfgs is an optimizer in the family of quasi-Newton methods.
+        ann=  MLPClassifier(solver='lbfgs', alpha=1e-5,
+                        hidden_layer_sizes=(18,8,7), random_state=1,learning_rate='constant')
+        #all the parameters of ann (output layer not comprised)
+        #param=ann.get_params()
+        #print(param)
+
+        # Training the ANN on the Training set
+        ann.fit(X_train, y_train)#, batch_size = 32, epochs = 100)#TEST 1
+        
+        
+        return ann
+    
 
     def neuralModel(self,data):
         # Modify stimulus
@@ -771,6 +798,9 @@ class Network:
         return simConfig
 
     def simulate(self, has_pd=1, dt=0.1, lfp=False, interval = 1000):
+
+
+        
         # Config
         simConfig = self.buildSimConfig(dt=dt, lfp=lfp)
 
@@ -795,9 +825,12 @@ class Network:
 
         # Save        
         sim.saveData()
-    def writecsv(self,isis_mean_ctx,isis_std_ctx):
-        filename = '/home/cata/nao_ws/src/rat_model/data/pd_stimu.csv'
-        # writing to csv file  
+
+
+    def writecsv(self,isis_mean_ctx,isis_std_ctx,proba_pd,stimulation):
+        global write_filename 
+        # writing to csv file 
+        """ 
         mean_isis_mean_ctx = round(np.mean(self.diff_mean_list),4)
         mean_isis_std_ctx = round(np.mean(self.diff_std_list),4)
         std_isis_mean_ctx = round(np.std(self.diff_mean_list),4)
@@ -806,6 +839,7 @@ class Network:
         var_isis_std_ctx = round(np.var(self.diff_std_list),4)
         meam_meanFR=round(np.mean(self.mean_FR_list),4)
         std_meanFR =round(np.std(self.mean_FR_list),4)
+        """
         #print(self.diff_mean_list)
         """
         print("mean firing each 100ms",meam_meanFR)
@@ -819,10 +853,12 @@ class Network:
         print("var diff mean ctx",var_isis_mean_ctx)
         print("var diff std ctx",var_isis_std_ctx)
         """
-        row=[sim.allSimData.popRates['CTX_RS'],isis_mean_ctx,isis_std_ctx,mean_isis_mean_ctx,mean_isis_std_ctx,std_isis_mean_ctx,
-        std_isis_std_ctx,var_isis_mean_ctx,var_isis_std_ctx,meam_meanFR,std_meanFR,self.seed]
 
-        with open(filename, 'a') as csvfile:  
+        #row=[self.amplitude,sim.allSimData.popRates['CTX_RS']]
+        row=[self.pd,proba_pd,stimulation,sim.allSimData.popRates['CTX_RS'],isis_mean_ctx,isis_std_ctx]#,mean_isis_mean_ctx,mean_isis_std_ctx,std_isis_mean_ctx,
+        #std_isis_std_ctx,var_isis_mean_ctx,var_isis_std_ctx,meam_meanFR,std_meanFR,self.seed]
+
+        with open(write_filename, 'a') as csvfile:  
             # creating a csv writer object  
             csvwriter = csv.writer(csvfile)  
             
@@ -834,7 +870,7 @@ class Network:
         # Check time
         self.current_interval = time
         #print("current interval", time)
-        
+        """
         sim.gatherData()        
 
         # Count spikes: cortex neurons        
@@ -891,6 +927,7 @@ class Network:
         # Save position for the next second          
         self.previous_interval = len(sim.allSimData['spkid'])
         """
+        """
         LAST RUN
         """
         #we only gather and publish data at the last interval.
@@ -915,7 +952,7 @@ class Network:
             #self.previous_interval = len(sim.allSimData['spkid'])
 
             # Calculate the average FR (firing rate) of Cortex neurons
-            mean_FR = countSpikes/10.0
+            #mean_FR = countSpikes/10.0
 
             # Calculate ISIs
             isis_mean = np.zeros(10)
@@ -934,33 +971,26 @@ class Network:
                     isis_std[i] = 0
 
             # Calculate the mean values of cortex neurons
-            # Calculate the mean values of cortex neurons
             isis_mean_ctx = round(np.mean(isis_mean),4)
             isis_std_ctx = round(np.mean(isis_std),4)
-            """
-            mean_isis_mean_ctx = np.mean(self.diff_mean_list)
-            mean_isis_std_ctx = np.mean(self.diff_std_list)
-            std_isis_mean_ctx = np.std(self.diff_mean_list)
-            std_isis_std_ctx = np.std(self.diff_std_list)            
-            var_isis_mean_ctx = np.var(self.diff_mean_list)
-            var_isis_std_ctx = np.var(self.diff_std_list)
-            #print(self.diff_mean_list)
-            print("mean firing each 100ms",np.mean(self.mean_FR_list))
-            print("std firing each 100ms",np.std(self.mean_FR_list))
-            print("ISIS MEAN CTX: ",isis_mean_ctx)
-            print("ISIS STD CTX: ",isis_std_ctx)
-            print("mean diff mean ctx",mean_isis_mean_ctx)
-            print("mean diff std ctx",mean_isis_std_ctx)
-            print("std diff mean ctx",std_isis_mean_ctx)
-            print("std diff std ctx",std_isis_std_ctx)
-            print("var diff mean ctx",var_isis_mean_ctx)
-            print("var diff std ctx",var_isis_std_ctx)
-            """
-            self.writecsv(isis_mean_ctx,isis_std_ctx)
+            
+            
             # Plot a raster
             sim.analysis.plotData()
             #sim.analysis.plotRaster()
-           
+
+            
+            result=np.array([[sim.allSimData.popRates['CTX_RS'],isis_mean_ctx,isis_std_ctx]])
+            pred_result=self.ann.predict_proba(self.sc.transform(result))
+
+            proba_pd=round(pred_result[0][0],3)
+            stimulation=round(pred_result[0][1])
+            self.writecsv(isis_mean_ctx,isis_std_ctx,proba_pd,stimulation)
+            #0.24 = 2* mean value of the proba issued when there is no pd (perfect case:0) based on the validation test (60data)
+            pd_tremor=max(0,(proba_pd-0.24))/3
+            self.avpopratesregions.append(stimulation)
+            self.avpopratesregions.append(pd_tremor)
+
             print("message sent to the muscles:",self.avpopratesregions )
             # Send the new information via ROS
             self.pub.publish(self.avpopratesregions)
@@ -973,15 +1003,12 @@ if __name__ == '__main__':
         # Create network
         pd = 0
         print("Parkinson?: ", pd)
-        #while not rospy.is_shutdown():
-        for i in range(50):
-            my_seed=np.random.uniform(-1,100)
-            #print("my seed: ",my_seed)
-
+        while not rospy.is_shutdown():
+            my_seed=np.random.uniform(-1,500)
+            print("my seed: ",my_seed)
             network = Network(t_sim = 800, has_pd=pd, seed=my_seed) #90000
         # Simulate 
             network.simulate(pd, dt = 0.1, lfp = False, interval = 100) #1000
-        
     except rospy.ROSInterruptException:
         pass
     
