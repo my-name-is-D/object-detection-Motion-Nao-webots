@@ -5,7 +5,7 @@
 (himself inspired from Kouretes github, see thesis :https://www.cs.umd.edu/~nkofinas/Projects/KofinasThesis.pdf for understanding NAO kinematic)
 
 # How this package work
-It has been adapted to ROS.
+Nao kinematic has seen on the original work has been adapted to ROS and my case
  
  ### V1
  An object position and orientation can be written in a txt file and read here, 
@@ -39,16 +39,25 @@ roslaunch kinematicnao workspacefilenao.launch
 Note: the workspace is a simplified version of Nao's workspace
 
 
-The workspace_stimulation.py is the python version of the workspace limitation, it send a binary stimulation if the point is in or out of the workspace
+A python version of the workspace limitation is workspace_stimulation in this package or is present in image_processing/simulation_image_form_color.py, it send a binary stimulation if the point is in or out of the workspace (and if the color of the object is not stimulating).
+
+The version retrieving the object pose from a topic is:
+
+```bash
+roslaunch kinematicnao mainworkspace.launch 
+```
+In this last version the trajectory received and the arm joints corresponding are saved in a txt file: joints.txt (saved in world/data/kinematic_joints/joints.txt)
 
 ### V4
 
-The object position is retrieved from a topic, the stimulation and muscle error comes from another (brain model's receives 1 or 0 to indicate a stimulation and the error associated to it (PD))
+The object position is retrieved from a topic, the stimulation and muscle error comes from another (brain model's receives 1 or 0 to indicate a stimulation and the noise associated to it (PD))
 The endpoint is decomposed in several sub_motion to be able to send perturbation to the muscles (or not) according to the brain status (Pd/healthy)
 
 ```bash
 roslaunch kinematicnao mainworkspace_decomposition.launch 
 ```
+
+In this version all the sub motions, received noises and the arm joints corresponding are saved in a txt file: joints_decompo.txt (saved in world/data/kinematic_joints/joints_decompo.txt)
 
 ## the python file
 
