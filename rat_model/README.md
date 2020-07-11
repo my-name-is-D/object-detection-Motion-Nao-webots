@@ -17,7 +17,12 @@ The probability of having PD, wether or not the model has PD and the frequency r
 The extracted data for the ANN comes from world/data/rat_model/pd_stimu_data_ANN.csv
 The saved data is saved in world/data/rat_model/pd_stimu.csv
 
+Everything is set and launched with 
 
+```bash
+roslaunch rat_model testbash.launch
+```
+(which launch the bashcommand.sh in script -to set the environment automatically-, be wary, to use you need to change the path to your repository in there)
 
 
 # Jhielson presentation of the rat_model
