@@ -12,7 +12,10 @@ roslaunch image_processing launch.launch
 ```bash
 rosrun image_processing simulation_image_form_color.py
 ```
-
+or 
+```bash
+roslaunch kinematicnao mainworkspace(_decomposition).launch
+```
 # SETUP and INFO
 
 ## Using our camera:
@@ -82,14 +85,6 @@ the data is transformed into an opencv image, canny edge detection is applied an
 The position of a known ball (known size) is calculated 
 Then, a part of the ellipse is prelevated and a color average is done, This color is then identified into: blue, yellow, green, red or none. 
 
-Then the color and position of the ball are sent in a topic.
-
-
-
-Two of the python files are codes previously made (by me or my team) to extract features with opencv (the "camera_proc_finish_GOOD.py") 
-Recognize money and their value. Done with pounds (NB: this file here is not executable as it is, i cleaned it a bit, will put the real code later, but not in this repository)
-
-The marker_map.py extract info from find_2D_object and send them to RVIZ, the rviz part doesn't work anymore right now (not been readapted)
-The marker_map.py is from : - https://github.com/my-name-is-D/Robotic-System-Science-Project
-
+Finally we verify if the ball is in Nao's workspace, a stimulation stimulus is sent according to the answe in a topic.
+Then the color and position of the ball are sent in another topic.
 
