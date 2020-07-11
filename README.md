@@ -1,10 +1,11 @@
 # object detection/motion-nao webots
 Ffirst step. Detect and extract object position, one version extracts object color. 
 
-Second step Send it to a computational model of rat with/without PD and extract relevant noise to send to the robot
+Second step. Send it to a computational model of rat with/without PD and extract relevant noise to send to the robot
 
-Third choose where to send the noise that will perturb (or not) the robot motion, execute an arm kinematic
+Third step.choose where to send the noise that will perturb (or not) the robot motion, and execute an arm kinematic
 
+Visualize it on webots, plot the motion with matplotlib
 ## Image processing
 
 Use find_2d_object & ROS or OpenCv & ROS (2 versions)
