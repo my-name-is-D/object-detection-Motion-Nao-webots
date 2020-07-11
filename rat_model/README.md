@@ -139,7 +139,9 @@ If you would like to look for new commands to generate plots or to even manipula
 Using topics and service, you can share information between this model and your robot's controller. For more information about simulating NAO robot on Webots and incorporating ROS on it, please check the following repository (https://github.com/jhielson/neurorobotics_computational_environment). 
 
 
-# my changes in rat_model2.py
+# my changes 
+
+## rat_model2.py
 
 A raster and an histogram can be plotted in the function buildSimConfig
 The average of each opulation can be retrieved in the function adjustNetworkAndCommunicateViaROS
@@ -147,7 +149,11 @@ A stimulation is received through ros
 A k-mean function has been implemented to determine in which cluster is the signal
 
 
+## rat_model3.py
+A stimulation is received through ros 
 
+Instead of a kmean cluster, an ANN is used.
+The probability of having PD, wether or not the model has PD and the frequency rate, ISI mean and ISI std of the model are saved in a csv file.
 
 
 
