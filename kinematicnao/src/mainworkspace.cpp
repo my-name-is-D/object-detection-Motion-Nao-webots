@@ -20,7 +20,7 @@ string color("blue");
 float lpx=218.65; //be wary, if you change here you also have to change something down, check it out
 float lpy=113;
 float lpz=65;
-double execution= 1.2;
+double execution= 0.0012;
 
 
 //MAIN TAKING OBJECT POSE FROM A TOPIC ("point" from image_processing launch.launch)
@@ -80,7 +80,7 @@ int main(int argc, char **argv){
     ros::Rate loop_rate(10);
 	NAOKinematics nkin;
 	NAOKinematics::kmatTable output1, output2;
-    string writedatapath="/home/cata/nao_ws/src/kinematicnao/data/joints.txt";
+    string writedatapath="/home/cata/nao_ws/src/world/data/kinematic_joints/joints.txt";
 	std::vector<float> joints(NUMOFJOINTS);
     string prev("");
     string prev2("");
@@ -115,7 +115,7 @@ int main(int argc, char **argv){
         }
 
 
-        if (execution==1.8 or starting_point==0){
+        if (execution==0.003 or starting_point==0){
 
             cout<<"angle sent";
             output1(0,3)=lpx;//350;  //forward/backward
