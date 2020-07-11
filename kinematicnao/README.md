@@ -30,7 +30,7 @@ roslaunch kinematicnao kinematicnao.launch
 
 ### V3
 
-The object position is retrieved from a file.
+The object position is retrieved from a file world/data/objectpoint.txt.
 If the position is in Nao's left arm workspace then the inverse kinematic is done, else a "position not ok" (or something) is sent through the topic "jointangles"
 
 ```bash
