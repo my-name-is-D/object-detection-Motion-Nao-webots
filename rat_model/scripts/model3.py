@@ -16,9 +16,11 @@ from rat_model.msg import list_pop
 import rospy
 from std_msgs.msg import Float64MultiArray,String
 
+import pickle
 #from sklearn.cluster import KMeans
-data_filename= '/home/cata/nao_ws/src/world/data/Rat_model/pd_stimu_data_ANN.csv'
-write_filename = '/home/cata/nao_ws/src/world/data/Rat_model/pd_stimu.csv'
+filenameann= '../../world/data/Rat_model/ann'
+filenamesc='../../world/data/Rat_model/sc'
+write_filename = '../../world/data/Rat_model/pd_stimu.csv'
 
 class Network:
     class Spikes:
@@ -55,7 +57,7 @@ class Network:
         # Variables to calculate ISIs(InterSpikes Interval)
         #self.one_second_data = [[],[],[],[],[],[],[],[],[],[]]
         #kmean initialization
-        self.ann=self.ANN_function()
+        self.ann, self.sc=self.ANN_function()
         #Subscriber
         rospy.Subscriber('/stimulation',Float64, self.neuralModel)
         # Parameters
@@ -74,7 +76,10 @@ class Network:
         self.pub=rospy.Publisher('/brainoutstimu',list_pop, queue_size=100)
     
     def ANN_function(self):
-        global data_filename
+
+        global filenameann, filenamesc
+        #With pickle, no need to recreate ann each time we restart the node (comment below), here we just load the ANN
+        """
         #Kmean initialization based on a fixed dataset (extendable)
         import pandas as pd
         # Importing the dataset
@@ -106,9 +111,15 @@ class Network:
 
         # Training the ANN on the Training set
         ann.fit(X_train, y_train)#, batch_size = 32, epochs = 100)#TEST 1
-        
-        
-        return ann
+        """
+
+        infile = open(filenameann,'rb')
+        ann= pickle.load(infile)
+        infile.close()
+        infile2=open(filenamesc,'rb')
+        sc= pickle.load(infile2)
+        infile2.close()
+        return ann,sc
     
 
     def neuralModel(self,data):
