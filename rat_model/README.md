@@ -1,6 +1,10 @@
 
 # my changes 
 
+# Prerequisite
+
+You need to have tensorflow installed
+
 ## rat_model2.py
 
 A raster and an histogram can be plotted in the function buildSimConfig
