@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+
+
+
+
+
+<launch>
+   <!-- <param name="use_sim_time" value="true" type="bool" /> -->
+ <!-- <node name="stimulation_decision" pkg="kinematicnao" type="workspace_stimulation.py" output="screen" /> -->
+ <node name="simulation_image" pkg="image_processing" type="simulation_image_form_color.py" output="screen" />   
+ <node name="talker" pkg="kinematicnao" type="decomposed_kinematic_2hands" output="screen" />
+<!--<node pkg="rat_model" type="bashcommand.sh" name="nrnivmodl" output="screen"/>-->
+
+
+</launch>
+
