@@ -7,7 +7,7 @@ project(kinematicnao)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs genmsg)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs genmsg rat_model message_generation)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -106,7 +106,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs genmsg)
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES kinematicnao
-#  CATKIN_DEPENDS other_catkin_pkg
+  CATKIN_DEPENDS message_runtime
 #  DEPENDS system_lib
 )
 
@@ -205,6 +205,14 @@ add_executable(workspacekinematicnao src/workspacefilemain.cpp src/NAOKinematics
 target_link_libraries(workspacekinematicnao ${catkin_LIBRARIES})
 add_executable(mainworkspace src/mainworkspace.cpp src/NAOKinematicsJacobian.cpp src/NAOKinematics.cpp)
 target_link_libraries(mainworkspace ${catkin_LIBRARIES})
+
+add_executable(decomposed_kinematic_1hand src/decomposed_kinematic_1hand.cpp src/NAOKinematicsJacobian.cpp src/NAOKinematics.cpp)
+target_link_libraries(decomposed_kinematic_1hand ${catkin_LIBRARIES})
+add_dependencies(decomposed_kinematic_1hand  ${catkin_EXPORTED_TARGETS})
+
+add_executable(decomposed_kinematic_2hands src/decomposed_kinematic_2hands.cpp src/NAOKinematicsJacobian.cpp src/NAOKinematics.cpp)
+target_link_libraries(decomposed_kinematic_2hands ${catkin_LIBRARIES})
+add_dependencies(decomposed_kinematic_2hands  ${catkin_EXPORTED_TARGETS})
 
 #add_dependencies(kinematicnao beginner_tutorials_generate_messages_cpp)
 ## Add gtest based cpp test target and link libraries
