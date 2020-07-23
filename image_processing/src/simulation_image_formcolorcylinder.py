@@ -224,15 +224,15 @@ def detect_ellipse(imgThresholded,width,saved):
         r2=ma/2 #radius 2 (it's an ellipse, not a circle)
         r=(((r1**2+r2**2)/2)**0.5) #we assume we have some kind of circle
         
-        distance = 1428*r**-0.9331#focallenght* ball_real_radius_mm/r
+        distance = (1428*r**-0.9331) +35#+65#focallenght* ball_real_radius_mm/r
         
         #angley = -1*((simulation_HFOV*(x/width)-(width/2))) #find the angle of view of the object (in x)
         #dY= distance*np.sin(angley*np.pi/180)
-        dY=-1*(x- width/2)#no px rectification here because we use the simulation camera, each px are a perfect squared unit.
+        dY=-1*(x- width/2)+12#no px rectification here because we use the simulation camera, each px are a perfect squared unit.
         number_of_circles=1+number_of_circles    
         my_circle_data.append([x,y,r,distance,dY])
         my_ellipse_data=my_circle_data
-        print ("distance MA,ma,x,y,r    :  ",distance,Ma,ma,x,y,r)
+        #print ("distance MA,ma,x,y,r    :  ",distance,Ma,ma,x,y,r)
     
     imgThresholded=cv2.drawContours(imgThresholded, contours, -1, (255,255,255), 3)
 
@@ -318,7 +318,7 @@ def color_callback(data):
     if object_present== True and my_ellipse_data!=[]:
         width=160 #x
         heigth=120 #y
-        z=0
+        z=-20
 
         my_ellipse= my_ellipse_data#to avoid that the other callback modify it while we work on it, i could use semaphore yes, but well
         
@@ -338,6 +338,14 @@ def color_callback(data):
         #check if we are in the workspace and color is stimulating
         workspace_check(color,my_ellipse,z)
 
+        
+        """
+        if my_ellipse[0][4]-30<-6:
+            my_ellipse[0][4]=my_ellipse[0][4]-10
+            print("there")
+        else:
+            my_ellipse[0][4]=my_ellipse[0][4]-20
+        """
         #if color != "red" and color!="none":
         position=PointStamped()
         position.point=Point(my_ellipse[0][3],my_ellipse[0][4],z)
