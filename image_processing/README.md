@@ -88,3 +88,18 @@ Then, a part of the ellipse is prelevated and a color average is done, This colo
 Finally we verify if the ball is in Nao's workspace, a stimulation stimulus is sent according to the answe in a topic.
 Then the color and position of the ball are sent in another topic.
 
+
+#### Simulation_image_formcolorcylinder.py
+
+It retrieves the same info from the same topics.
+The object to detect is now a cylinder, therefore the visual processing strategy completely changed.
+the bottom part of the cylinder is erased from the image considering that's the bottom will be darker than the top that receives the light (therefore the code is not adapted to dark video or to image lighten from behind the camera). Then a canny and ellipse detection is used.
+
+The position of the cylinder is calculated and an offset is added (for the kinematic, to be able to grasp the object). Warning: the calculus obtained is ideal for a 10m radius, else need to add an offset (or redo a curve fitting).
+
+The color average is the same (just note that the image is resized differently).
+The workspace check is the same and the topic messages as well.
+
+
+
+
