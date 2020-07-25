@@ -15,11 +15,11 @@ Solid {
     Shape {
       appearance PBRAppearance {
         baseColor IS color
-        roughness 0.3
+        roughness 0.2
         metalness 0
       }
       geometry DEF CANDY_BALL_SHAPE Sphere {
-        radius 0.0325
+        radius 0.02
         subdivision 3
       }
     }

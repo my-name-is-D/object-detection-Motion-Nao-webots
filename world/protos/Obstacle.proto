@@ -1,0 +1,71 @@
+#VRML_SIM R2020a utf8
+# license: Copyright Cyberbotics Ltd. Licensed for use only with Webots.
+# license url: https://cyberbotics.com/webots_assets_license
+
+PROTO Obstacle [
+  field SFVec3f translation 0 0.025 0
+  field SFColor color 1 0.501961 0.25098
+  field SFString name "obstacle"
+  field SFFloat    mass        0.2 
+]
+{
+  Solid {
+    translation IS translation
+    children [
+      DEF TRAY_GROUP Group {
+        children [
+          DEF CYLINDER Transform {
+            translation 0 0 0
+            children [
+              Shape {
+                appearance PBRAppearance {
+                  baseColor IS color
+                  metalness 0
+                  roughness 0.4
+                }
+                geometry DEF CYLINDER1 Cylinder {
+                  height 0.07
+                  radius 0.01
+                  subdivision 24
+                }
+              }
+          ]
+        }
+        DEF UP Transform {
+          translation 0 0.035 0
+          children [
+            Shape {
+              appearance PBRAppearance {
+                  baseColor IS color
+                  metalness 0
+                  roughness 0.4
+                }
+              geometry DEF CYLINDER2 Cylinder {
+                  height 0.001
+                  radius 0.015
+                  subdivision 24
+                }
+            }
+          ]
+        }
+        
+        
+        
+        
+        
+        
+        
+        
+      ]
+   }
+ ]   
+    name IS name
+    model "obstacle"
+    boundingObject USE TRAY_GROUP
+    physics Physics {
+    density -1
+    mass IS mass
+    
+  }
+  }
+}
