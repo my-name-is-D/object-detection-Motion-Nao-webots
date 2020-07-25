@@ -6,7 +6,7 @@
 
 <launch>
 <!-- This first node is used for test bench, here we don't need to launch everything but just this launch in order to have the model running with the necessary topic-->
- <!--<node name="stimulation_decision" pkg="kinematicnao" type="workspace_stimulation.py" output="screen" />-->
+<!--<node name="stimulation_decision" pkg="kinematicnao" type="workspace_stimulation.py" output="screen" />-->
 <node pkg="rat_model" type="bashcommand.sh" name="nrnivmodl" output="screen"/>
 
 

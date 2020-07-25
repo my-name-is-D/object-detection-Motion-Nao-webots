@@ -997,8 +997,8 @@ class Network:
             proba_pd=round(pred_result[0][0],3)
             stimulation=round(pred_result[0][1])
             self.writecsv(isis_mean_ctx,isis_std_ctx,proba_pd,stimulation)
-            #0.24 = 2* mean value of the proba issued when there is no pd (perfect case:0) based on the validation test (60data)
-            pd_tremor=max(0,(proba_pd-0.24))/3
+            #0.39 = 3* mean value of the proba issued when there is no pd (perfect case:0) based on the validation test (60data)
+            pd_tremor=max(0,(proba_pd-0.13*3))/3
             self.avpopratesregions.append(stimulation)
             self.avpopratesregions.append(pd_tremor)
 

@@ -73,6 +73,7 @@ class Network:
         #Kmean initialization based on a fixed dataset (extendable)
         import pandas as pd
         # Importing the dataset
+        #dataset format rate | PD 
         dataset = pd.read_csv('/home/cata/nao_ws/src/rat_model/data/pd_stimu.csv')
         X = dataset.iloc[:, [0, 1]].values
         #print("in the Kmean")
