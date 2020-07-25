@@ -98,7 +98,7 @@ int main(int argc, char **argv){
     ros::Subscriber sub3 = n.subscribe("/brainoutstimu", 1000,stimulationcallback);
     ros::Rate loop_rate(10);
 
-	NAOKinematics nkin;
+	NAOKinematics nkin, nkinright;
 	NAOKinematics::kmatTable output1, output2;
     string writedatapath="/home/cata/nao_ws/src/world/data/kinematic_joints/2hands_joints_decompo.txt";
 	std::vector<float> joints(NUMOFJOINTS);
@@ -128,6 +128,7 @@ int main(int argc, char **argv){
         lrx=0;//empirical observation
         lry=0;
         lrz=0;
+        float angrx=0;
         float angry=0;
         float angrz=0;
 
@@ -175,12 +176,42 @@ int main(int argc, char **argv){
                     output2(2,3)=output1(2,3)=prevlpz+lz*div;//+std::rand() % 5;//200+100; //up/down
 
                     //If we finished the full motion, we update the previous pose.
+                    ifstream write;
+                    write.open("/home/cata/nao_ws/src/world/data/objectangle.txt");
+                    if (!write) {
+                        cerr << "Unable to open file objectpoint.txt";
+                        exit(1);   // call system to stop
+                    }
+                    //left
+                    write >> lrx >> lry >> lrz;//rot left x,y,z
+                    //right
+                    write >> angrx >> angry >> angrz;//rot right x,y,z
+
+                    write.close();
+
+                    /*
+                    lrx=0;//empirical observation
+                    lry=30;//((float)div_number-(float)div+1);
+                    lrz=10;///((float)div_number-(float)div+1);
+                    angry=-5;///((float)div_number-(float)div+1);
+                    angrz=5;///((float)div_number-(float)div+1);
+                    angrz=-angrz;
+                    */
+                    cout << " div number - div " << lrx;
+                    cout << " div number - div " << lry;
+                    cout << " div number - div " << lrz;
+
+                    cout << " div number - div " << angry;
+                    cout << " div number - div " << angrz;
+
+
                     if (div==div_number){
                         prevlpx=lpx;
                         prevlpy=lpy;
                         prevlpz=lpz;
                         prevrpy=rry;
                     }
+
 
                     //rotation
                     float mat[9];
@@ -199,7 +230,7 @@ int main(int argc, char **argv){
                     output1(2,2)=mat[8];
 
                     float mat1[9];
-                    convert(lrx,angry,angrz,mat1);
+                    convert(angrx,angry,angrz,mat1);
 
 
                     output2(0,0)=mat1[0];
@@ -236,8 +267,8 @@ int main(int argc, char **argv){
                     joints[R_ARM+SHOULDER_ROLL]=0;
                     joints[R_ARM+ELBOW_YAW]=0;
                     joints[R_ARM+ELBOW_ROLL]=0;
-                    nkin.setJoints(joints);
-                    resultr = nkin.jacobianInverseRightHand(output2);
+                    nkinright.setJoints(joints);
+                    resultr = nkinright.jacobianInverseRightHand(output2);
 
 
                     if(!resultl.empty() and !resultr.empty()){

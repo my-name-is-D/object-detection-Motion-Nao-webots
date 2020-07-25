@@ -70,10 +70,10 @@ def callback(data):
 
     if execution == False:
         print("Object not interesting")
-        stimulation=1.2
+        stimulation=0.0012
     else:
         print("Object interesting")
-        stimulation=1.8
+        stimulation=0.003
     pub_stimulation.publish(stimulation)
 
 
@@ -127,7 +127,7 @@ def main_func():
     """
 
 
-    print(color,lpx,lpy,lpz)
+    #print(color,lpx,lpy,lpz)
 
 
     #np.warnings.filterwarnings('ignore')#to ignore the "invalid value if arcsin not possible"
@@ -165,11 +165,11 @@ def main_func():
         execution= False
 
     if execution == False:
-        print("Object not interesting")
+        #print("Object not interesting")
         stimulation=0.0012
     else:
-        print("Object interesting")
-        stimulation=0.003
+        #print("Object interesting")
+        stimulation=0.0035
     pub_stimulation.publish(stimulation)
 def main():
     rospy.init_node("stimulation_decision")

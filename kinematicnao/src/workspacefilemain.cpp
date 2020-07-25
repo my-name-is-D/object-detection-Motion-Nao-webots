@@ -137,7 +137,8 @@ int main(int argc, char **argv){
             output1(2,1)=mat[7];
             output1(2,2)=mat[8];
 
-            vector<vector<float> > result;
+            vector<vector<float> > resultl;
+            vector<vector<float> > resultr;
             /**
             * This is a message object. You stuff it with data, and then publish it.
             */
@@ -150,15 +151,16 @@ int main(int argc, char **argv){
             joints[L_ARM+ELBOW_YAW]=0;
             joints[L_ARM+ELBOW_ROLL]=0;
             nkin.setJoints(joints);
-            result = nkin.jacobianInverseLeftHand(output1);
-            if(!result.empty()){
+            resultl = nkin.jacobianInverseLeftHand(output1);
+
+            if(!resultl.empty()){
                 ofstream read;
                 read.open("read.txt");
                 stringstream fullstream;
-                for(unsigned int j=0; j<result[0].size(); j++){
+                for(unsigned int j=0; j<resultl[0].size(); j++){
                     stringstream littlestream, stream;
-                    cout << "angle" << j << " = " << result[0][j] << " ";
-                    stream << fixed << setprecision(4) << result[0][j];
+                    cout << "angle" << j << " = " << resultl[0][j] << " ";
+                    stream << fixed << setprecision(4) << resultl[0][j];
 
                     fullstream<<stream.str()<<",";
 
@@ -166,6 +168,8 @@ int main(int argc, char **argv){
                     read << s << ",";
                     //cout << s << " , ";
                 }
+
+
                 read.close();
                 msg.data = fullstream.str();
             }
