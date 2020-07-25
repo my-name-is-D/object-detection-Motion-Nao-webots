@@ -32,9 +32,12 @@ def gray_callback(data):
     #transform the 1D list into a 2D array
     for x in range(0, width*heigth):
         gray_image[int(x/width)][x%width] = gray_image_1D[x]
-    
+    cv2.imshow("image_gray",gray_image)
+    cv2.waitKey(1)
     #take only the contour of the objects
     gray_image = cv2.Canny(gray_image,80,80)
+
+    
 
     my_ellipse_data=detect_ellipse(gray_image,width)
     #my_ellipse_data= detect_circles(gray_image,width)
@@ -48,7 +51,7 @@ def detect_ellipse(imgThresholded,width):
     global object_present
     global my_ellipse_data
 
-    ball_real_radius_mm= 32.5 #in mm
+    ball_real_radius_mm= 20 #in mm
     simulation_HFOV=45
     focallenght = 182#for the fictive frame 180x120
     
@@ -108,7 +111,7 @@ function not used, alternative to ellipse
 def detect_circles(imgThresholded, width):
     global object_present
     global my_ellipse_data
-    ball_real_radius_mm= 32.5 #simulation ball
+    ball_real_radius_mm= 20 #simulation ball
     simulation_HFOV=45
     focallenght = 182# for the fictive frame 180x120
     #imgThresholded=cv2.cvtColor(imgThresholded,cv2.COLOR_BGR2GRAY) #Convert the captured frame from a 3channel (BGR2HSV) to 1
@@ -174,7 +177,7 @@ def color_callback(data):
     if object_present== True and my_ellipse_data!=[]:
         width=160 #x
         heigth=120 #y
-        z=5
+        z=0
 
         my_ellipse= my_ellipse_data#to avoid that the other callback modify it while we work on it, i could use semaphore yes, but well
         

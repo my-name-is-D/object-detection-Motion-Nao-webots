@@ -35,54 +35,23 @@ def gray_callback(data):
     
     #transform the 1D list into a 2D array
     for x in range(0, width*heigth):
-        #
-        if gray_image_1D[x] < 250:
-            print gray_image_1D[x]
-            gray_image_1D[x] = 255
         gray_image[int(x/width)][x%width] = gray_image_1D[x]
-        if gray_image[int(x/width)][x%width] < 100:
-            #print gray_image[int(x/width)][x%width]
-            gray_image[int(x/width)][x%width] = 255
+    
     saved=gray_image
     #try to erase noise
-    #cv2.imshow("first", gray_image)
 
-    gray_image = cv2.GaussianBlur(gray_image,(5,5),0)
+    cv2.imshow("first", gray_image)
+    cv2.waitKey(1)
+    gray_image = cv2.GaussianBlur(gray_image,(1,1),0)
 
     #gray_image=cv2.Laplacian(gray_image, cv2.CV_8U, gray_image, ksize = 5)
-       #Iincrease the brightness of the image by 50per 
-    #gray_image= cv2.add(gray_image,np.array([-80.0]))
+   
 
-    #cv2.imshow("darker", gray_image)
+    #"""
+    th2 = cv2.adaptiveThreshold(gray_image,255, cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY_INV,25,5)
+    
 
-        #Threshold
-    #TOL = 90**2
-    
-    #((c_r - ref_r).^2 + (c_g - ref_g).^2 + (c_b - ref_b).^2)
-    #Res = gray_image[...,0]
-    #print(Res)
-    """
-    #<= tolerance^2 then 255
-    Res[np.where(Res<=[TOL])]=[255]
-    Res[np.where(Res!=[255])]=[0]
-    Res1 = cv2.bitwise_not(Res.astype(np.uint8))
-    Res1 = cv2.merge((Res1))
-    Trest = cv2.bitwise_and(gray_image,Res1)
-
-    """
-
-    
-    
-    th2 = cv2.Canny(gray_image,100,180)
-    #th2 = cv2.adaptiveThreshold(gray_image,255, cv2.ADAPTIVE_THRESH_MEAN_C,cv2.THRESH_BINARY_INV,13,5)
-    #th2= cv2.erode(th2,kernel4, iterations = 1)
-    #th2= cv2.dilate(th2,kernel4, iterations = 1)
-    #th2= cv2.erode(th2,kernel3, iterations = 2)
-    #th2= cv2.erode(th2,kernelH, iterations = 1)
-    #th2= cv2.dilate(th2,kernel3, iterations = 2)
-    #cv2.imshow("check mask", th2)
-    """
-    
+    th2= cv2.erode(th2,kernel4, iterations = 3)
     th2= cv2.erode(th2,kernel3, iterations = 1)
     th2= cv2.dilate(th2,kernelH, iterations = 3)
     th2= cv2.erode(th2,kernelH, iterations = 2)
@@ -100,7 +69,7 @@ def gray_callback(data):
 
 
     gray_image = cv2.GaussianBlur(res,(5,5),0)
-   
+    #"""
 
     
     #take only the contour of the objects
@@ -123,7 +92,6 @@ def gray_callback(data):
     #cv2.imshow("th2", gray_image)
     #Specify size on vertical axis
     """
-    """
     vertical = gray_image.copy()
     verticalsize = vertical / 30
     verticalStructure = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
@@ -139,8 +107,8 @@ def gray_callback(data):
 
 
 
-    my_ellipse_data=detect_ellipse(th2,width,saved)
-    #my_ellipse_data= detect_circles(gray_image,width)
+    #my_ellipse_data=detect_ellipse(gray_image,width,saved)
+    my_ellipse_data= detect_circles(gray_image,width)
 
     
 
@@ -165,6 +133,7 @@ def detect_ellipse(imgThresholded,width,saved):
         #print(hierarchy)
         
     
+    tempo_info=[]
     n=0
     for cnt in contours:
         #print ("cnt", cnt)
@@ -176,16 +145,16 @@ def detect_ellipse(imgThresholded,width,saved):
         #print len(approx)
         #if len(approx)<6:
         #    continue
-        
+        n+=1
+        if n>1:
+            continue
         cv2.fillPoly(imgThresholded,pts=contours,color=(255,255,255))
         #print "ellipse"
-        cv2.drawContours(imgThresholded,[cnt],0,(200,0,122),-1)
+        cv2.drawContours(saved,[cnt],0,(200,0,122),-1)
 
         #cv2.imshow("image shapes",saved)
-        #cv2.waitKey(1)
-        if n>0: #I want 1 contour, one and one only.
-            continue
-        n+=1
+        cv2.waitKey(1)
+
     #cv2.drawContours(saved,[cnt],0,(0,0,122),-1)
 
 #//THE ONE interesting IS N==1 (the contour of the circle above)
@@ -218,22 +187,22 @@ def detect_ellipse(imgThresholded,width,saved):
     
         x=ellipse[0][0]
         y=ellipse[0][1]
-        #not to account for hypothetic truncated ellipse (not necessary anymore but well security first)
-        if y>130 or y<30:
+        if y>100 or y<50:
             continue       
         r1=Ma/2 #radius 1
         r2=ma/2 #radius 2 (it's an ellipse, not a circle)
         r=(((r1**2+r2**2)/2)**0.5) #we assume we have some kind of circle
-                                        #radius=10mm
-        distance = (2010*r**-0.9042)-20 #(1428*r**-0.9331) +35#+65#focallenght* ball_real_radius_mm/r
+        
+        distance = 5.49501*Ma - 7.77369*ma + 250.85954#focallenght* ball_real_radius_mm/r
         
         #angley = -1*((simulation_HFOV*(x/width)-(width/2))) #find the angle of view of the object (in x)
         #dY= distance*np.sin(angley*np.pi/180)
-        dY=-1*(x- width/2)+12#no px rectification here because we use the simulation camera, each px are a perfect squared unit.
+        dY=-1*(x- width/2)#no px rectification here because we use the simulation camera, each px are a perfect squared unit.
         number_of_circles=1+number_of_circles    
         my_circle_data.append([x,y,r,distance,dY])
         my_ellipse_data=my_circle_data
-        #print ("distance MA,ma,x,y,r    :  ",distance,Ma,ma,x,y,r)
+        tempo_info.append([Ma,ma,x,y])
+        print ("distance MA,ma,x,y    :  ",distance,Ma,ma,x,y)
     
     imgThresholded=cv2.drawContours(imgThresholded, contours, -1, (255,255,255), 3)
 
@@ -315,11 +284,11 @@ def detect_circles(imgThresholded, width):
 def color_callback(data):
     global object_present
     global my_ellipse_data
-   
+
     if object_present== True and my_ellipse_data!=[]:
         width=160 #x
         heigth=120 #y
-        z=-20
+        z=0
 
         my_ellipse= my_ellipse_data#to avoid that the other callback modify it while we work on it, i could use semaphore yes, but well
         
@@ -332,21 +301,13 @@ def color_callback(data):
         #transform the 1D list into a 2D array BGR image
         for x in range(0, width*heigth*3):
             color_image[int(x/(width*3))][int(x/3)%(width)][x%3] = color_image_1D[x]
-
+        
         #extract the ball color
         color=image_treatment(color_image,my_ellipse)
 
         #check if we are in the workspace and color is stimulating
         workspace_check(color,my_ellipse,z)
 
-        
-        """
-        if my_ellipse[0][4]-30<-6:
-            my_ellipse[0][4]=my_ellipse[0][4]-10
-            print("there")
-        else:
-            my_ellipse[0][4]=my_ellipse[0][4]-20
-        """
         #if color != "red" and color!="none":
         position=PointStamped()
         position.point=Point(my_ellipse[0][3],my_ellipse[0][4],z)
@@ -371,26 +332,18 @@ def image_treatment(color_image,my_ellipse_data):
     lower_green = np.array([0, 100, 0])
     upper_green = np.array([119, 255, 119])
 
-    lower_blue = np.array([50,50,120])
+    lower_blue = np.array([60,60,120])
     upper_blue = np.array([120,120,255])
  
     #I take only a part of the ball as a pic
-    img = color_image[ int(my_ellipse_data[0][1] - my_ellipse_data[0][2]/2) : int(my_ellipse_data[0][1] + my_ellipse_data[0][2]/2) , int(my_ellipse_data[0][0] - my_ellipse_data[0][2]/2) : int(my_ellipse_data[0][0] + my_ellipse_data[0][2]/2)]
-    #cv2.imshow("color", img)
-    #cv2.waitKey(1)
+    img = color_image[ int(my_ellipse_data[0][1] - my_ellipse_data[0][2]/3) : int(my_ellipse_data[0][1] + my_ellipse_data[0][2]/4) , int(my_ellipse_data[0][0] - my_ellipse_data[0][2]/3) : int(my_ellipse_data[0][0] + my_ellipse_data[0][2]/4)]
+    
     #I extract the mean color from the resized pic
     img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
     #Iincrease the brightness of the image by 50per 
-    #img= cv2.add(img,np.array([50.0])) #NOT USEFULL WITH CYLINDER (as light is right on it)
+    img= cv2.add(img,np.array([50.0]))
     #extract average color in RGB
     average = img.mean(axis=0).mean(axis=0)
-    
-
-
-
-    #print("average", average)
-    
-
 
     check=0
     #we check if the average is in the boundaries
