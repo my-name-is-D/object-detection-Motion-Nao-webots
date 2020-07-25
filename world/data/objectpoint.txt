@@ -1,4 +1,4 @@
-215
+115
 76
 16
 0
@@ -22,8 +22,10 @@ blue
 ---
 130
 36.25
--0
+0
 -0.56
 0
 -0.825
 
+
+-simplification de données pour le ml 
