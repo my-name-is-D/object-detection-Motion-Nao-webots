@@ -67,7 +67,4 @@ a python file to plot them is also here.
 ```
 
 
-## Warnings
-the proto may not be complete, see Webots official Nao's world and add my stuff to yours, it would be safer. 
-
 
