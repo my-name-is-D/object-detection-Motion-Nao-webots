@@ -51,6 +51,7 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    list_pop.msg
+   interference.msg
 #   Message2.msg
  )
 
