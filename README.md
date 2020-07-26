@@ -8,7 +8,7 @@ See below the exploitable workspace.
 
 <div style="text-align:center">
 <p align="center">
-<img src="https://github.com/my-name-is-D/object-detection-Motion-Nao-webots/blob/master/img/exploitable workspace.PNG" width="400" >
+<img src="https://github.com/my-name-is-D/object-detection-Motion-Nao-webots/blob/master/img/exploitable%20workspace.png" width="400" >
 </p>
 </div>
 
