@@ -1,7 +1,5 @@
 <div style="text-align:center">
-<p align="center">
 <img src="https://github.com/sma20/HSR/blob/master/image/1200px-Heriot-Watt_University_logo.svg.png " width="150" >
-</p>
 </div>
 
 # object detection/motion-nao webots
