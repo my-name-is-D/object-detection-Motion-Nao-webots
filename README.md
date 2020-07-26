@@ -39,14 +39,14 @@ A version consider Nao's workspace before calculating the angle joints.
 Another decompose the trajectory into sub-motion
 The angle joints for each motion is saved in txt files. 
 
-##rat_model
+## rat_model
 
 The rat model is jhielson's (see:https://github.com/jhielson) with adaptations to fit my case, see his github to install required dependencies
+HAVE TO WAIT FOR THE AUTHORISATION TO PUBLISH WORK BASED ON JHIELSON'S IN MY GIT REP (Private for the moment)
 
-HAVE TO WAIT FOR THE AUTHORISATION TO PUBLISH THAT IN MY GIT REP (Private for the moment)
+The stimulation and Pd probabilities are saved in a csv file (in world/data)
 
-The stimulation and Pd probabilities are saved in a csv file.
-
+However, all the machine learning tests are there, in a Machine Learning folder: Naive Bayes, Linear/Logistic regression, K-mean clusters, the support vector regression model and the feed forward ANN 
 ## world
 
 Subscribe to the topic publsihed by kinematic nao and move nao to the given position.
