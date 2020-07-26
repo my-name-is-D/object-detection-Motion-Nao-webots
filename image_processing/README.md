@@ -1,8 +1,10 @@
 # What this package does
-This package is composed of 2 versoins.
+This package is composed of 3 versions.
 1. try to identify an image thanks to find_2d_object, process the object pose and extract the position according to the camera frame. Then the id of the object seen and its position x,y,z are sent as a topic. 
-2. extract from a topic an image (sent as a string in the topic) reconstruct the string into an image format then extract ellipses from the picture and calculate the simulated ball position (known size).
+2. extract from a topic an image (sent as a string in the topic) reconstruct the string into an image format then extract ellipses from the picture and calculate the simulated ball position (known size). Works with a ball.
 If the average color of the ellipse is red (or non identified), nothing is sent back, else the color and position are sent back into a topic.
+
+the 3rd version does the same as version too but with a cylinder as used object (modified a bit)
 
 1
 ```bash
@@ -12,10 +14,22 @@ roslaunch image_processing launch.launch
 ```bash
 rosrun image_processing simulation_image_form_color.py
 ```
+
+3
+```bash
+rosrun image_processing simulation_image_formcolorcylinder.py
+```
 or 
 ```bash
 roslaunch kinematicnao mainworkspace(_decomposition).launch
 ```
+
+## Limits
+
+Version 2 and 3: need to be well lighted
+Version 3: light must not comes from the camera direction (as the cylinder form is erased on the premise that it's darker than the top)
+
+
 # SETUP and INFO
 
 ## Using our camera:
