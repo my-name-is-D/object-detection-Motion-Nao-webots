@@ -24,11 +24,17 @@ Visualize it on webots, plot the motion with matplotlib
 ## Architecture
 All the architecture was composed with ROS
 
-
-
+Node communication schema:
 <div style="text-align:center">
 <p align="center">
 <img src="https://github.com/my-name-is-D/object-detection-Motion-Nao-webots/blob/master/img/process.PNG" width="400" >
+</p>
+</div>
+
+Flow chart of the process (keep in mind that each node works in parallel, but the data coming from the visual processing won't be treated until the next node as finished working on the previous data).
+<div style="text-align:center">
+<p align="center">
+<img src="https://github.com/my-name-is-D/object-detection-Motion-Nao-webots/blob/master/img/flowchart%20simplified.PNG" width="400" >
 </p>
 </div>
 
