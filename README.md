@@ -3,6 +3,16 @@
 </div>
 
 # object detection/motion-nao webots
+Goal: See an object, decide wether it is interesting or not (as to be a cylinder/ball - green/blue - in Nao's left arm workspace). If it's interesting a high stimulation is sent to the rat model, else a low stimulation is sent. An ANN determines if the rat model as PD and his stimulated and send a noise and a stmulation to the kinematic that, if the stimulation is high send the orders to the left arm joints in webots. The robots reachs and grasp the object. 
+See below the exploitable workspace.
+
+<div style="text-align:center">
+<p align="center">
+<img src="https://github.com/my-name-is-D/object-detection-Motion-Nao-webots/blob/master/img/exploitable workspace.PNG" width="400" >
+</p>
+</div>
+
+
 First step. Detect and extract object position, one version extracts object color. 
 
 Second step. Send it to a computational model of rat with/without PD and extract relevant noise to send to the robot
@@ -12,6 +22,7 @@ Third step.choose where to send the noise that will perturb (or not) the robot m
 Visualize it on webots, plot the motion with matplotlib
 
 ## Architecture
+All the architecture was composed with ROS
 
 <div style="text-align:center">
 <p align="center">
@@ -21,6 +32,11 @@ Visualize it on webots, plot the motion with matplotlib
 
 
 
+<div style="text-align:center">
+<p align="center">
+<img src="https://github.com/my-name-is-D/object-detection-Motion-Nao-webots/blob/master/img/process.PNG" width="400" >
+</p>
+</div>
 
 
 ## Image processing
@@ -38,6 +54,9 @@ transform it into angle joint and send them back as a topic.
 A version consider Nao's workspace before calculating the angle joints.
 Another decompose the trajectory into sub-motion
 The angle joints for each motion is saved in txt files. 
+Adapted for left arm
+
+There is a code adapted for both arm, but not quite performant for the right arm.
 
 ## rat_model
 
