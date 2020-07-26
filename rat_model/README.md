@@ -1,3 +1,6 @@
+# UNCOMPLETE, WAITING FOR AUTHORIZATION TO SHARE 
+
+The src folder only has general netpyne files and some test code I used, for the moment.
 
 # my changes 
 
