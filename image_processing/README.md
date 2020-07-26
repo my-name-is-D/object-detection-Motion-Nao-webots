@@ -2,9 +2,20 @@
 This package is composed of 3 versions.
 1. try to identify an image thanks to find_2d_object, process the object pose and extract the position according to the camera frame. Then the id of the object seen and its position x,y,z are sent as a topic. 
 2. extract from a topic an image (sent as a string in the topic) reconstruct the string into an image format then extract ellipses from the picture and calculate the simulated ball position (known size). Works with a ball.
-If the average color of the ellipse is red (or non identified), nothing is sent back, else the color and position are sent back into a topic.
 
-the 3rd version does the same as version too but with a cylinder as used object (modified a bit)
+If the average color of the ellipse is red (or non identified), nothing is sent back, else the color and position are sent back into a topic.
+<div style="text-align:center">
+<p align="center">
+<img src="https://github.com/my-name-is-D/object-detection-Motion-Nao-webots/blob/master/img/visual%20proc%20step%20cylinder.PNG" width="300" >
+</p>
+</div>
+the 3rd version does the same as version 2 but with a cylinder as used object (adapted a bit).
+
+<div style="text-align:center">
+<p align="center">
+<img src="https://github.com/my-name-is-D/object-detection-Motion-Nao-webots/blob/master/img/circle%visual%proc.PNG" width="300" >
+</p>
+</div>
 
 1
 ```bash
@@ -14,6 +25,8 @@ roslaunch image_processing launch.launch
 ```bash
 rosrun image_processing simulation_image_form_color.py
 ```
+
+
 
 3
 ```bash
