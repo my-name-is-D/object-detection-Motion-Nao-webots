@@ -81,3 +81,7 @@ All the data are in this package.
 
 See https://github.com/jhielson/neurorobotics_computational_environment for installing webots for this case. 
 Note: don't hesitate to check the issue if you need to use gazebo on Ros melodic (gazebo 9) instead. (If you are on kinetic, there should be no issue normally) 
+
+## Youtube link
+
+## Thesis link? 
