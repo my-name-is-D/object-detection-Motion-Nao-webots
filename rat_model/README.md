@@ -3,7 +3,7 @@
 
 # Prerequisite
 
-You need to have tensorflow installed
+You need to have Ros, netpyne, tensorflow installed (see end of readme for links).
 
 ## rat_model2.py
 
