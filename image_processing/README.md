@@ -101,5 +101,7 @@ The color average is the same (just note that the image is resized differently).
 The workspace check is the same and the topic messages as well.
 
 
+## Prerequisit
 
+You need Opencv2 
 
