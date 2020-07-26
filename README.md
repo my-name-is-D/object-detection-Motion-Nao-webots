@@ -82,6 +82,13 @@ All the data are in this package.
 See https://github.com/jhielson/neurorobotics_computational_environment for installing webots for this case. 
 Note: don't hesitate to check the issue if you need to use gazebo on Ros melodic (gazebo 9) instead. (If you are on kinetic, there should be no issue normally) 
 
+World actual setup:
+<p align="center">
+<img src="https://github.com/my-name-is-D/object-detection-Motion-Nao-webots/blob/master/img/setup.png" width="400" >
+</p>
+</div>
+
+
 ## Youtube link
 
 ## Thesis link? 
