@@ -89,6 +89,33 @@ World actual setup:
 </div>
 
 
+
+
+When trying to launch all the packages together:
+Launch first 
+1.
+```bash
+ roslaunch kinematicnao decomposed_kinematic_1hand.launch 
+```
+2.
+```bash
+ roslaunch rat_model testbash.launch 
+```
+3.
+```bash
+ roslaunch webots_ros complete_test.launch 
+```
+
+Then once you want to restart a simulation for the first time,
+you have to close and relaunch
+2.
+then
+1. 
+in this order (1. once 2. is fully operational)
+Once this done you can do as many simulation as you like by just restarting 1.
+
+The reason of this operation is a roscore problem, both webots and 1. are masters, while rat_model need to have a roscore running to operate. So starting the kinematic then the rat model, the rat model has a roscore (and just one). If you stop the kinematic, the rat model lose its roscore and stops working.  
+
 ## Youtube link
 
 ## Thesis link? 
