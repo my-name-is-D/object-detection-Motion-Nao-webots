@@ -2,45 +2,16 @@
 
 The src folder only has general netpyne files and some test code I used, for the moment.
 
-# my changes 
 
-# Prerequisite
+## Jhielson presentation of the rat_model
 
-You need to have Ros, netpyne, tensorflow installed (see end of readme for links).
-
-## rat_model2.py
-
-A raster and an histogram can be plotted in the function buildSimConfig
-The average of each opulation can be retrieved in the function adjustNetworkAndCommunicateViaROS
-A stimulation is received through ros 
-A k-mean function has been implemented to determine in which cluster is the signal
-
-
-## rat_model3.py
-A stimulation is received through ros 
-
-Instead of a kmean cluster, an ANN is used.
-The probability of having PD, wether or not the model has PD and the frequency rate, ISI mean and ISI std of the model are saved in a csv file.
-The extracted data for the ANN comes from world/data/rat_model/pd_stimu_data_ANN.csv
-The saved data is saved in world/data/rat_model/pd_stimu.csv
-
-Everything is set and launched with 
-
-```bash
-roslaunch rat_model testbash.launch
-```
-(which launch the bashcommand.sh in script -to set the environment automatically-, be wary, to use you need to change the path to your repository in there)
-
-
-# Jhielson presentation of the rat_model
-
-# A biophysical model inspired by the brain structures of rats 
+## A biophysical model inspired by the brain structures of rats 
 
 The BG-C-T system was built using NetPyNE library and can be simulated on NEURON. 
 
 You can also use ROS to communicate to other applications and share data via topics and services.  
 
-## Installation
+### Installation
 
 System running Ubuntu 18.04. Follow instructions on linked websites to install required tools.
 
@@ -81,7 +52,7 @@ $ cd ~/catkin_ws/src/rat_model/scripts/
 $ nrnivmodl
 ```
 
-## Running the simulation
+### Running the simulation
 
 1. Start ROS by running `roscore` in a second terminal
 2. Make sure the rat_model package is on the `$ROS_PACKAGE_PATH` by running `source devel/setup.bash`
@@ -101,7 +72,7 @@ $ cd ~/catkin_ws/src/rat_model/scripts/
 $ nrnivmodl
 ```
 
-## Tutorial
+### Tutorial
 
 This model was designed inspired by the following work:
 
@@ -163,12 +134,47 @@ You might need to change the intesity of some stimulus that are aplied directly 
 sim.net.modifyStims({'conds':{'source':'Input_th'},'cellConds':{'pop':'TH'},'amp':0.0018})
 ```
 
-## NetPyNE
+### NetPyNE
 
 If you would like to look for new commands to generate plots or to even manipulate the model, please check the documentation and tutorials available on NetPyNE webpage (http://netpyne.org/tutorial.html).
 
-## NAO robot + ROS
+### NAO robot + ROS
 
 Using topics and service, you can share information between this model and your robot's controller. For more information about simulating NAO robot on Webots and incorporating ROS on it, please check the following repository (https://github.com/jhielson/neurorobotics_computational_environment). 
 
 
+# my changes 
+
+# Prerequisite
+
+You need to have Ros, netpyne, tensorflow installed (see end of readme for links).
+
+## rat_model2.py
+
+A raster and an histogram can be plotted in the function buildSimConfig
+The average of each opulation can be retrieved in the function adjustNetworkAndCommunicateViaROS
+A stimulation is received through ros 
+A k-mean function has been implemented to determine in which cluster is the signal
+
+
+## rat_model3.py
+A stimulation is received through ros 
+
+Instead of a kmean cluster, an ANN is used.
+The probability of having PD, wether or not the model has PD and the frequency rate, ISI mean and ISI std of the model are saved in a csv file.
+The extracted data for the ANN comes from world/data/rat_model/pd_stimu_data_ANN.csv
+The saved data is saved in world/data/rat_model/pd_stimu.csv
+
+Everything is set and launched with 
+
+```bash
+roslaunch rat_model testbash.launch
+```
+(which launch the bashcommand.sh in script -to set the environment automatically-, be wary, to use you need to change the path to your repository in there)
+
+## Machine learning tests
+
+contain all the Machine leraning test:
+K-mean clustering/ SVR/ Linear and Logistic Regression/ Naive bayes and ANN
+as well as the database 
+and the last accuracy test file
