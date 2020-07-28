@@ -136,7 +136,7 @@ int main(int argc, char **argv){
         float lrx,lry,lrz;//,rrx,rry,rrz; //rot
 
         ifstream write;
-        write.open("/home/cata/nao_ws/src/world/data/objectangle.txt");
+        write.open("/home/cata/nao_ws/src/world/data/kinematic_joints/objectangle.txt");
         if (!write) {
             cerr << "Unable to open file objectpoint.txt";
             exit(1);   // call system to stop
@@ -167,7 +167,7 @@ int main(int argc, char **argv){
                 unsigned int div_number=16;
 
                 if (abs(lpx-prevlpx)<30 and starting_point!=0){
-                    div_number=6;
+                    div_number=1;
                     lpz=3;
                 }
 
@@ -275,12 +275,12 @@ int main(int argc, char **argv){
 
                             float merror=dist(gen);
                             cout<<"NOISE :"<< merror<<"\n";
-                            if (div<div_number){
+                            //if (div<=div_number){
                                 stream << fixed << setprecision(4) << result[0][j]+merror;
-                            }
-                            else{
+                            //}
+                            /*else{
                                 stream << fixed << setprecision(4) << result[0][j];
-                            }
+                            }*/
                             //cout << "angle" << j << " = " << result[0][j]/div << " ";
 
                             fullstream<<stream.str()<<","; //to send in the topic
