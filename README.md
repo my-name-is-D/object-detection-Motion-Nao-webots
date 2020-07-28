@@ -1,5 +1,5 @@
 <div style="text-align:center">
-<img src="https://github.com/sma20/HSR/blob/master/image/1200px-Heriot-Watt_University_logo.svg.png " width="150" >
+<img src="https://github.com/my-name-is-D/object-detection-Motion-Nao-webots/blob/master/img/logo.PNG" width="600" >
 </div>
 
 # object detection/motion-nao webots
