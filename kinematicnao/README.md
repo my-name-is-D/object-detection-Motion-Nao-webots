@@ -54,13 +54,20 @@ The object position is retrieved from a topic, the stimulation and muscle error 
 The endpoint is decomposed in several sub_motion to be able to send perturbation to the muscles (or not) according to the brain status (Pd/healthy)
 
 ```bash
-roslaunch kinematicnao mainworkspace_decomposition.launch 
+roslaunch kinematicnao decomposed_kinematic_1hand.launch
 ```
 
 In this version all the sub motions, received noises and the arm joints corresponding are saved in a txt file: joints_decompo.txt (saved in world/data/kinematic_joints/joints_decompo.txt)
+The object is reached at an higher height in 16 submotions then in the 17th, the hand goes down on the object
 
 Also, this launch also launchs the simulation_image_form_color.py from image_processing.
 
+
+Another version tries to reach the object with two hands
+```bash
+roslaunch kinematicnao decomposed_kinematic_2hands.launch
+```
+not quite successful with the right arm.
 ## the python file
 
 Is the workspace determination and the stimulation signal sent to the rat_model.
