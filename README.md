@@ -1,5 +1,5 @@
 <div style="text-align:center">
-<img src="https://github.com/my-name-is-D/object-detection-Motion-Nao-webots/blob/master/img/logo.PNG" width="800" >
+<img src="https://github.com/my-name-is-D/object-detection-Motion-Nao-webots/blob/master/img/logo.PNG" width="700" >
 </div>
 
 # object detection/motion-nao webots
