@@ -120,5 +120,6 @@ Once this done you can do as many simulation as you like by just restarting 1.
 The reason of this operation is a roscore problem, both webots and 1. are masters, while rat_model need to have a roscore running to operate. So starting the kinematic then the rat model, the rat model has a roscore (and just one). If you stop the kinematic, the rat model lose its roscore and stops working.  
 
 ## Youtube link
+https://youtu.be/nFZwJooueXs
 
 ## Thesis link? 
