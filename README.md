@@ -4,6 +4,9 @@
  </p>
 </div>
 
+The objective of this work was to have a complete pipeline to see an object and grab it while considering a brain model to highlight Parkinson's symptom. The purpose of such a pipeline would be to perform preliminary Parkinson's experiments on simulations and robots to reduce the need of animal experiments and speed up research.
+This is to consider in the limit of the task and the liability of the brain model and is as such a preliminary work showing the possibility of such a project in a larger scale.
+
 # object detection/motion-nao webots
 Goal: See an object, decide wether it is interesting or not (as to be a cylinder/ball - green/blue - in Nao's left arm workspace). If it's interesting a high stimulation is sent to the rat model, else a low stimulation is sent. An ANN determines if the rat model as PD and his stimulated and send a noise and a stmulation to the kinematic that, if the stimulation is high send the orders to the left arm joints in webots. The robots reachs and grasp the object. 
 See below the exploitable workspace.
