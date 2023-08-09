@@ -1,9 +1,8 @@
-# UNCOMPLETE, WAITING FOR AUTHORIZATION TO SHARE 
-
-The src folder only has general netpyne files and some test code I used, for the moment.
-
 
 ## Jhielson presentation of the rat_model
+
+Jhielson's work on PD rat model: [Initial_Neurorobotics_Model_of_PD
+Public](https://github.com/jhielson/Initial_Neurorobotics_Model_of_PD), released to the public after this thesis.
 
 ## A biophysical model inspired by the brain structures of rats 
 
