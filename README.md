@@ -65,8 +65,7 @@ There is a code adapted for both arm, but not quite performant for the right arm
 
 ## rat_model
 
-The rat model is jhielson's (see:https://github.com/jhielson) with adaptations to fit my case, see his github to install required dependencies
-HAVE TO WAIT FOR THE AUTHORISATION TO PUBLISH WORK BASED ON JHIELSON'S IN MY GIT REP (Private for the moment)
+The rat model is jhielson's (see:https://github.com/jhielson) with adaptations to fit my case, see his github to install required dependencies [Initial_Neurorobotics_Model_of_PD](https://github.com/jhielson/Initial_Neurorobotics_Model_of_PD)
 
 The stimulation and Pd probabilities are saved in a csv file (in world/data)
 
